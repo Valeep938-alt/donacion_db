@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BloodBank SENA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --text-muted: #7A8A7A;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+            /* Fondo de pantalla completa */
+            background: url('/imagenes/fondo.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Overlay oscuro para mejor legibilidad */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(61, 74, 61, 0.4);
+            z-index: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6 { 
+            font-family: 'Playfair Display', serif; 
+            font-weight: 500;
+        }
+
+        /* ===== CARD PRINCIPAL ===== */
+        .login-card {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            background: var(--warm-white);
+            border-radius: 30px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* ===== PANEL IZQUIERDO (SNOOPY) ===== */
+        .image-panel {
+            flex: 0 0 368px; /* Mitad del ancho de la imagen original 736px */
+            background: #C5D1B8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-panel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            display: block;
+        }
+
+        /* ===== PANEL DERECHO (FORM) ===== */
+        .form-panel {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2.5rem;
+            background: var(--warm-white);
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--terracotta) 100%);
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 6px 20px rgba(139, 157, 131, 0.3);
+        }
+
+        .login-header h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== FORMULARIO ===== */
+        .form-label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+        }
+
+        .form-control {
+            border: 2px solid var(--beige);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: var(--cream);
+        }
+
+        .form-control:focus {
+            border-color: var(--terracotta);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #bbb;
+        }
+
+        .input-icon {
+            position: relative;
+        }
+
+        .input-icon i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--sage-green);
+            z-index: 2;
+            font-size: 1rem;
+        }
+
+        .input-icon .form-control {
+            padding-left: 2.5rem;
+        }
+
+        /* ===== CHECKBOX Y LINKS ===== */
+        .form-check {
+            margin: 0.8rem 0;
+        }
+
+        .form-check-input {
+            border: 2px solid var(--beige);
+            border-radius: 5px;
+            cursor: pointer;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--terracotta);
+            border-color: var(--terracotta);
+        }
+
+        .form-check-label {
+            font-size: 0.85rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: var(--sage-green);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-link:hover {
+            color: var(--terracotta);
+        }
+
+        /* ===== BOTONES ===== */
+        .btn-login {
+            width: 100%;
+            background: var(--terracotta);
+            color: white;
+            padding: 0.9rem;
+            border-radius: 25px;
+            border: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-login:hover {
+            background: var(--sage-green);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 157, 131, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== ALERTAS ===== */
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            font-size: 0.85rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.2rem;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-error {
+            background-color: rgba(196, 69, 54, 0.08);
+            color: #C44536;
+            border-left: 4px solid #C44536;
+        }
+
+        .alert-success {
+            background-color: rgba(139, 157, 131, 0.12);
+            color: var(--sage-dark);
+            border-left: 4px solid var(--sage-green);
+        }
+
+        /* ===== FOOTER DEL LOGIN ===== */
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid var(--beige);
+        }
+
+        .login-footer p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .sena-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+        }
+
+        .sena-badge i {
+            color: var(--terracotta);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .signup-link a {
+            color: var(--terracotta);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .signup-link a:hover {
+            color: var(--sage-green);
+        }
+
+        /* ===== SPINNER ===== */
+        .spinner {
+            display: inline-block;
+            width: 1.1rem;
+            height: 1.1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991.98px) {
+            body {
+                padding: 1rem;
+                background-attachment: scroll;
+            }
+            .login-card {
+                flex-direction: column;
+                max-width: 400px;
+                min-height: auto;
+            }
+            .image-panel {
+                flex: none;
+                height: 280px;
+                width: 100%;
+            }
+            .image-panel img {
+                object-fit: cover;
+                object-position: center top;
+            }
+            .form-panel {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                border-radius: 20px;
+            }
+            .image-panel {
+                height: 220px;
+            }
+            .form-panel {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Card Principal -->
+    <div class="login-card">
+
+        <!-- Panel Izquierdo - Snoopy -->
+        <div class="image-panel">
+            <img src="/imagenes/snoopy.jpg" 
+                 alt="Bienvenido a BloodBank" 
+                 onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #C5D1B8 0%, #B5C4A8 100%)';">
+        </div>
+
+        <!-- Panel Derecho - Formulario -->
+        <div class="form-panel">
+            <div class="login-container">
+
+                <!-- Header -->
+                <div class="login-header">
+                    <div class="login-logo">
+                        <i class="bi bi-droplet-fill"></i>
+                    </div>
+                    <h2>Iniciar Sesión</h2>
+                    <p>Ingresa tus credenciales para continuar</p>
+                </div>
+
+                <!-- Alertas -->
+                <div id="alertContainer"></div>
+
+                <!-- Formulario -->
+                <form id="loginForm">
+
+                    <!-- Usuario -->
+                    <div class="mb-3 input-icon">
+                        <label class="form-label">Usuario</label>
+                        <i class="bi bi-person"></i>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="username" 
+                            name="username"
+                            placeholder="Ingresa tu usuario"
+                            required
+                            autocomplete="username"
+                        >
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="mb-3 input-icon">
+                        <label class="form-label">Contraseña</label>
+                        <i class="bi bi-lock"></i>
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="password" 
+                            name="password"
+                            placeholder="••••••••"
+                            required
+                            autocomplete="current-password"
+                        >
+                    </div>
+
+                    <!-- Botón Login -->
+                    <button type="submit" class="btn btn-login" id="btnLogin">
+                        <span class="spinner" style="display: none;"></span>
+                        <span>Iniciar Sesión</span>
+                    </button>
+
+                </form>
+
+                <!-- Sign up link -->
+                <div class="signup-link">
+                    inivcio <a href="/">Volver al Inicio</a>
+                </div>
+
+                <!-- Footer -->
+                <div class="login-footer">
+                    <p>Sistema de Gestión de Donación de Sangre</p>
+                    <div class="sena-badge">
+                        <i class="bi bi-mortarboard-fill"></i>
+                        SENA CIMM ADSO
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = 'http://localhost:8080/api/auth/login';
+
+        const form = document.getElementById('loginForm');
+        const btnLogin = document.getElementById('btnLogin');
+        const alertContainer = document.getElementById('alertContainer');
+        const spinner = btnLogin.querySelector('.spinner');
+        const btnText = btnLogin.querySelector('span:last-child');
+
+        function showAlert(message, type = 'error') {
+            alertContainer.innerHTML = `
+                <div class="alert alert-custom alert-${type}">
+                    <i class="bi bi-${type === 'error' ? 'exclamation-circle' : 'check-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `;
+            if (type === 'success') {
+                setTimeout(() => {
+                    alertContainer.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        function setLoading(loading) {
+            if (loading) {
+                btnLogin.disabled = true;
+                spinner.style.display = 'inline-block';
+                btnText.textContent = 'Verificando...';
+            } else {
+                btnLogin.disabled = false;
+                spinner.style.display = 'none';
+                btnText.textContent = 'Iniciar Sesión';
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            setLoading(true);
+            alertContainer.innerHTML = '';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.text();
+
+                if (response.ok) {
+                    showAlert('✅ ' + data, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard'; 
+                    }, 1500);
+                } else {
+                    showAlert('❌ ' + data, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('⚠️ Error de conexión. Verifica que el servidor esté activo.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>

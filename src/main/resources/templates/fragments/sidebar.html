@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="sidebar-css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --dark-sidebar: #2C3E2D;
+            --text-muted: #7A8A7A;
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 70px;
+            --transition-speed: 0.3s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--warm-white);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', serif; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: var(--dark-sidebar);
+            color: var(--cream);
+            z-index: 1000;
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        /* Header */
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 75px;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--cream);
+        }
+
+        .sidebar-brand-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--terracotta);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .sidebar-brand-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-toggle {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: var(--cream);
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-speed);
+            flex-shrink: 0;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            transform: rotate(180deg);
+        }
+
+        /* Navegación */
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.35);
+            margin: 1.2rem 0 0.6rem 0.5rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            opacity: 0;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.8rem 1rem;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 0.4rem;
+            transition: all var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--terracotta);
+            transform: scaleY(0);
+            transition: transform var(--transition-speed);
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.06);
+            color: var(--cream);
+        }
+
+        .sidebar-link:hover::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar-link.active {
+            background: rgba(212, 165, 116, 0.15);
+            color: white;
+            font-weight: 500;
+        }
+
+        .sidebar-link.active::before {
+            transform: scaleY(1);
+            background: var(--terracotta);
+        }
+
+        .sidebar-link-icon {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-link-text {
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .sidebar-link-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-link-badge {
+            margin-left: auto;
+            background: var(--terracotta);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            opacity: 1;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .sidebar-link-badge {
+            opacity: 0;
+        }
+
+        /* Footer */
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-user-avatar {
+            width: 34px;
+            height: 34px;
+            background: var(--sage-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-info {
+            opacity: 1;
+            transition: opacity var(--transition-speed);
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .sidebar-user-info {
+            opacity: 0;
+            width: 0;
+        }
+
+        .sidebar-user-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--cream);
+        }
+
+        .sidebar-user-role {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .sidebar-logout {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1rem;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all var(--transition-speed);
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(212, 165, 116, 0.1);
+            color: var(--terracotta);
+        }
+
+        .sidebar-logout-icon {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logout-text {
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .sidebar-logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Contenido Principal */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: margin-left var(--transition-speed) ease;
+            min-height: 100vh;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Overlay móviles */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width) !important;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .sidebar.collapsed {
+                width: var(--sidebar-width) !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .sidebar-toggle {
+                display: none !important;
+            }
+
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 998;
+            background: var(--dark-sidebar);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+
+        /* Tooltip sidebar colapsado */
+        .sidebar.collapsed .sidebar-link {
+            position: relative;
+        }
+
+        .sidebar.collapsed .sidebar-link:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--dark-sidebar);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            z-index: 1001;
+            margin-left: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Animación entrada */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .sidebar-nav .sidebar-link {
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        .sidebar-nav .sidebar-link:nth-child(1) { animation-delay: 0.05s; }
+        .sidebar-nav .sidebar-link:nth-child(2) { animation-delay: 0.1s; }
+        .sidebar-nav .sidebar-link:nth-child(3) { animation-delay: 0.15s; }
+        .sidebar-nav .sidebar-link:nth-child(4) { animation-delay: 0.2s; }
+        .sidebar-nav .sidebar-link:nth-child(5) { animation-delay: 0.25s; }
+        .sidebar-nav .sidebar-link:nth-child(6) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR FRAGMENT -->
+    <nav th:fragment="sidebar" class="sidebar" id="sidebar">
+
+        <!-- Header -->
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-brand">
+                <div class="sidebar-brand-icon">
+                    <i class="bi bi-droplet-fill"></i>
+                </div>
+                <span class="sidebar-brand-text">BloodBank</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebarToggle" title="Colapsar/Expandir">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- Navegación -->
+        <div class="sidebar-nav">
+            <div class="nav-section-title">Menú Principal</div>
+
+            <a href="/dashboard" 
+               class="sidebar-link" 
+               th:classappend="${#strings.equals(currentView, 'dashboard')} ? 'active'"
+               data-tooltip="Dashboard">
+                <span class="sidebar-link-icon"><i class="bi bi-speedometer2"></i></span>
+                <span class="sidebar-link-text">Dashboard</span>
+            </a>
+
+            <a href="/donantes" 
+               class="sidebar-link" 
+               th:classappend="${#strings.equals(currentView, 'donantes')} ? 'active'"
+               data-tooltip="Donantes">
+                <span class="sidebar-link-icon"><i class="bi bi-person-heart"></i></span>
+                <span class="sidebar-link-text">Donantes</span>
+            </a>
+
+            <a href="/donaciones" 
+               class="sidebar-link"
+               th:classappend="${#strings.equals(currentView, 'donaciones')} ? 'active'"
+               data-tooltip="Donaciones">
+                <span class="sidebar-link-icon"><i class="bi bi-droplet"></i></span>
+                <span class="sidebar-link-text">Donaciones</span>
+            </a>
+
+            <a href="/consentimientos" 
+               class="sidebar-link"
+               th:classappend="${#strings.equals(currentView, 'consentimientos')} ? 'active'"
+               data-tooltip="Consentimientos">
+                <span class="sidebar-link-icon"><i class="bi bi-file-earmark-check"></i></span>
+                <span class="sidebar-link-text">Consentimientos</span>
+            </a>
+
+            <a href="/inventario" 
+               class="sidebar-link"
+               th:classappend="${#strings.equals(currentView, 'inventario')} ? 'active'"
+               data-tooltip="Inventario">
+                <span class="sidebar-link-icon"><i class="bi bi-box-seam"></i></span>
+                <span class="sidebar-link-text">Inventario</span>
+                <span class="sidebar-link-badge">8</span>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar">A</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">Admin</div>
+                    <div class="sidebar-user-role">Administrador</div>
+                </div>
+            </div>
+
+            <button type="button" class="sidebar-logout" onclick="window.location.href='/login'">
+                <span class="sidebar-logout-icon"><i class="bi bi-box-arrow-left"></i></span>
+                <span class="sidebar-logout-text">Cerrar Sesión</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Overlay móviles -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Botón móvil -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <script th:fragment="sidebar-js">
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+
+            // Toggle sidebar (desktop)
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                });
+            }
+
+            // Restaurar estado
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
+            }
+
+            // Mobile menu
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('mobile-open');
+                    sidebarOverlay.classList.toggle('show');
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('mobile-open');
+                    sidebarOverlay.classList.remove('show');
+                });
+            }
+
+            // Cerrar sidebar al click en link (mobile)
+            const sidebarLinks = sidebar.querySelectorAll('.sidebar-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('mobile-open');
+                        sidebarOverlay.classList.remove('show');
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

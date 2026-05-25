@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' - BloodBank SENA'">Formulario - BloodBank SENA</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Sidebar CSS -->
+    <div th:replace="~{fragments/sidebar :: sidebar-css}"></div>
+
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --text-muted: #7A8A7A;
+            --danger: #C44536;
+            --danger-light: #FDE8E6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5, h6 { 
+            font-family: 'Playfair Display', serif; 
+            font-weight: 500;
+        }
+
+        /* Form Container */
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        /* Card Custom */
+        .card-custom {
+            background: var(--warm-white);
+            border-radius: 20px;
+            border: 1px solid var(--beige);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .card-custom:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .card-body-custom { padding: 2rem; }
+
+        /* Form Controls */
+        .form-label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--beige);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            transition: all 0.3s ease;
+            background-color: var(--cream);
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        .form-control::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--sage-green);
+            background-color: var(--warm-white);
+            box-shadow: 0 0 0 4px rgba(139, 157, 131, 0.15);
+            outline: none;
+        }
+        .form-control.is-invalid {
+            border-color: var(--danger);
+            background-color: var(--danger-light);
+        }
+        .form-control.is-invalid:focus {
+            box-shadow: 0 0 0 4px rgba(196, 69, 54, 0.15);
+        }
+        .invalid-feedback {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Input Group */
+        .input-group-text {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+            color: white;
+            border: 2px solid var(--beige);
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            padding: 0.8rem 1rem;
+        }
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+        }
+
+        /* Buttons */
+        .btn-custom {
+            background: linear-gradient(135deg, var(--terracotta) 0%, #c49460 100%);
+            color: white;
+            padding: 0.9rem 2.5rem;
+            border-radius: 30px;
+            border: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3);
+            letter-spacing: 0.5px;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 157, 131, 0.3);
+        }
+
+        .btn-secondary-custom {
+            background: var(--beige);
+            color: var(--dark);
+            padding: 0.9rem 2.5rem;
+            border-radius: 30px;
+            border: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-secondary-custom:hover {
+            background: var(--sage-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--dark);
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            border: 2px solid var(--beige);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .btn-back:hover {
+            background: var(--beige);
+            color: var(--dark);
+        }
+
+        /* Checkbox */
+        .form-check-input {
+            width: 1.5em;
+            height: 1.5em;
+            border: 2px solid var(--beige);
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .form-check-input:checked {
+            background-color: var(--terracotta);
+            border-color: var(--terracotta);
+        }
+        .form-check-input:focus {
+            box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
+        }
+        .form-check-label {
+            color: var(--dark);
+            font-size: 0.95rem;
+            padding-left: 0.3rem;
+        }
+
+        /* Alerts */
+        .alert-custom {
+            border-radius: 15px;
+            border: none;
+            padding: 1.2rem 1.5rem;
+            font-size: 0.95rem;
+        }
+        .alert-danger-custom {
+            background: var(--danger-light);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+        .alert-info-custom {
+            background: rgba(139, 157, 131, 0.1);
+            color: var(--sage-dark);
+            border-left: 4px solid var(--sage-green);
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        .page-header h2 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--cream);
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        footer p {
+            opacity: 0.6;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-container { padding: 1rem; }
+            .card-body-custom { padding: 1.5rem; }
+            .page-header h2 { font-size: 1.6rem; }
+            .btn-custom, .btn-secondary-custom {
+                padding: 0.8rem 1.8rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="form-container">
+
+                <!-- Header -->
+                <div class="page-header">
+                    <a href="/donantes" class="btn-back">
+                        <i class="bi bi-arrow-left"></i>Volver
+                    </a>
+                    <h2 th:text="${titulo}">Título del Formulario</h2>
+                    <p class="text-muted">Complete la información del donante</p>
+                </div>
+
+                <!-- Alertas de error -->
+                <div th:if="${mensajeError}" class="alert alert-danger-custom alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${mensajeError}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Alertas de validación -->
+                <div th:if="${errorEdad}" class="alert alert-danger-custom alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-x-circle-fill me-2"></i>
+                    <strong>Edad no válida:</strong> <span th:text="${errorEdad}">El donante debe ser mayor de 18 años</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div th:if="${errorPeso}" class="alert alert-danger-custom alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-x-circle-fill me-2"></i>
+                    <strong>Peso insuficiente:</strong> <span th:text="${errorPeso}">El donante debe pesar al menos 50 kg</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div th:if="${errorConsentimiento}" class="alert alert-danger-custom alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-x-circle-fill me-2"></i>
+                    <strong>Consentimiento requerido:</strong> <span th:text="${errorConsentimiento}">Debe aceptar el consentimiento informado</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Formulario -->
+                <form th:action="@{${accion}}" th:object="${donante}" method="post" novalidate>
+
+                    <!-- Información Personal -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-person-fill"></i>
+                            Información Personal
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombres *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input type="text" class="form-control" th:field="*{nombres}" 
+                                               th:classappend="${#fields.hasErrors('nombres')} ? 'is-invalid' : ''"
+                                               placeholder="Ingrese sus nombres" required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Apellidos *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input type="text" class="form-control" th:field="*{apellidos}" 
+                                               th:classappend="${#fields.hasErrors('apellidos')} ? 'is-invalid' : ''"
+                                               placeholder="Ingrese sus apellidos" required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Documento *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                        <input type="text" class="form-control" th:field="*{documento}" 
+                                               th:classappend="${#fields.hasErrors('documento')} ? 'is-invalid' : ''"
+                                               placeholder="Número de documento" required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('documento')}" th:errors="*{documento}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Fecha de Nacimiento *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                                        <input type="date" class="form-control" th:field="*{fechaNacimiento}" 
+                                               th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'is-invalid' : ''"
+                                               required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Tipo de Sangre *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-droplet"></i></span>
+                                        <select class="form-select" th:field="*{tipoSangre}" 
+                                                th:classappend="${#fields.hasErrors('tipoSangre')} ? 'is-invalid' : ''"
+                                                required>
+                                            <option value="">Seleccione...</option>
+                                            <option th:each="tipo : ${tiposSangre}" 
+                                                    th:value="${tipo}" 
+                                                    th:text="${tipo.descripcion}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('tipoSangre')}" th:errors="*{tipoSangre}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Peso (kg) *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-speedometer2"></i></span>
+                                        <input type="number" step="0.1" class="form-control" 
+                                               th:field="*{peso}" 
+                                               th:classappend="${#fields.hasErrors('peso')} ? 'is-invalid' : ''"
+                                               placeholder="Ej: 65.5" required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('peso')}" th:errors="*{peso}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Contacto -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-telephone-fill"></i>
+                            Información de Contacto
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Teléfono *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                        <input type="tel" class="form-control" th:field="*{telefono}" 
+                                               th:classappend="${#fields.hasErrors('telefono')} ? 'is-invalid' : ''"
+                                               placeholder="Número de teléfono" required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Correo Electrónico *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input type="email" class="form-control" th:field="*{correo}" 
+                                               th:classappend="${#fields.hasErrors('correo')} ? 'is-invalid' : ''"
+                                               placeholder="correo@ejemplo.com" required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Dirección *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                        <input type="text" class="form-control" th:field="*{direccion}" 
+                                               th:classappend="${#fields.hasErrors('direccion')} ? 'is-invalid' : ''"
+                                               placeholder="Dirección completa" required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consentimiento -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-file-earmark-check-fill"></i>
+                            Consentimiento Informado
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" 
+                                       th:field="*{aceptaConsentimiento}" id="aceptaConsentimiento" 
+                                       th:classappend="${#fields.hasErrors('aceptaConsentimiento')} ? 'is-invalid' : ''"
+                                       required>
+                                <label class="form-check-label" for="aceptaConsentimiento">
+                                    Acepto el consentimiento informado para la donación de sangre *
+                                </label>
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('aceptaConsentimiento')}" th:errors="*{aceptaConsentimiento}"></div>
+                            </div>
+                            <div class="alert alert-info-custom" role="alert">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                Al aceptar, usted autoriza el uso de su sangre para fines médicos y de investigación.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between gap-3 flex-wrap">
+                        <button type="submit" class="btn btn-custom">
+                            <i class="bi bi-check-circle me-2"></i>Guardar Donante
+                        </button>
+                        <a href="/donantes" class="btn btn-secondary-custom">
+                            <i class="bi bi-x-circle me-2"></i>Cancelar
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="sena-badge"><i class="bi bi-building"></i> SENA - Servicio Nacional de Aprendizaje</p>
+            <p>&copy; 2025 BloodBank SENA. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="~{fragments/sidebar :: sidebar-js}"></div>
+
+</body>
+</html>

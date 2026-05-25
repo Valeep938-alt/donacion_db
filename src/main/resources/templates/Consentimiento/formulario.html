@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' - BloodBank SENA'">Formulario - BloodBank SENA</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <div th:replace="~{fragments/sidebar :: sidebar-css}"></div>
+
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --text-muted: #7A8A7A;
+            --primary-red: #C44536;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+        }
+
+        .form-container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding-bottom: 3rem;
+        }
+
+        .page-header { padding: 2rem 0 1.5rem; }
+
+        .page-header h2 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .page-header p { color: var(--text-muted); font-size: 1rem; }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--beige);
+            color: var(--dark);
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            border: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .btn-back:hover { background: var(--sage-green); color: white; }
+
+        .section-tag {
+            display: inline-block;
+            background: var(--terracotta-light);
+            color: var(--dark);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-custom {
+            background: var(--warm-white);
+            border-radius: 20px;
+            border: 1px solid var(--beige);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+            color: white;
+            padding: 1.2rem 1.8rem;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-body-custom { padding: 1.8rem 2rem; }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.4rem;
+            font-size: 0.92rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--beige);
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--cream);
+            font-size: 0.95rem;
+            color: var(--dark);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--sage-green);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(139,157,131,0.15);
+            outline: none;
+        }
+
+        .form-check-input {
+            width: 1.3em;
+            height: 1.3em;
+            border: 2px solid var(--beige);
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--sage-green);
+            border-color: var(--sage-green);
+        }
+
+        /* Firma actual */
+        .firma-actual-box {
+            border: 2px solid var(--beige);
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--cream);
+        }
+
+        .firma-actual-header {
+            background: var(--beige);
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--dark);
+        }
+
+        .firma-actual-header i { color: var(--sage-green); }
+
+        .firma-actual-body {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+            background: white;
+        }
+
+        .firma-actual-body img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .firma-url-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--sage-green);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--sage-green);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .firma-url-link:hover {
+            background: var(--sage-green);
+            color: white;
+        }
+
+        /* Estado badge */
+        .estado-selector {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .estado-option {
+            flex: 1;
+            border: 2px solid var(--beige);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: var(--cream);
+        }
+
+        .estado-option:hover { border-color: var(--sage-green); }
+
+        .estado-option.selected-aceptado {
+            border-color: var(--sage-green);
+            background: rgba(139,157,131,0.1);
+        }
+
+        .estado-option.selected-pendiente {
+            border-color: var(--terracotta);
+            background: rgba(212,165,116,0.1);
+        }
+
+        .estado-option i { font-size: 1.5rem; margin-bottom: 0.3rem; display: block; }
+
+        .estado-option span { font-size: 0.9rem; font-weight: 600; }
+
+        /* File upload */
+        .file-upload-area {
+            border: 2px dashed var(--beige);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            background: var(--cream);
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .file-upload-area:hover { border-color: var(--sage-green); background: white; }
+
+        .file-upload-area i { font-size: 2rem; color: var(--terracotta); margin-bottom: 0.5rem; display: block; }
+
+        .file-upload-area p { color: var(--text-muted); font-size: 0.88rem; margin: 0; }
+
+        /* Preview imagen subida */
+        .preview-nueva-imagen {
+            display: none;
+            margin-top: 1rem;
+            border: 2px solid var(--sage-green);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .preview-nueva-imagen .preview-header {
+            background: rgba(139,157,131,0.1);
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--sage-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .preview-nueva-imagen img {
+            display: block;
+            max-width: 100%;
+            max-height: 200px;
+            margin: 0.8rem auto;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .preview-nueva-imagen .preview-pdf {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Consentimiento box */
+        .consentimiento-box {
+            background: linear-gradient(135deg, rgba(139,157,131,0.08) 0%, rgba(212,165,116,0.08) 100%);
+            border: 1px solid var(--beige);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .consentimiento-box h5 {
+            color: var(--primary-red);
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .consentimiento-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .consentimiento-text p { margin-bottom: 0.6rem; }
+        .consentimiento-text p:last-child { margin-bottom: 0; }
+
+        /* Buttons */
+        .btn-custom {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+            color: white;
+            padding: 0.85rem 2.5rem;
+            border-radius: 30px;
+            border: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139,157,131,0.35);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139,157,131,0.4);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background-color: var(--beige);
+            color: var(--dark);
+            padding: 0.85rem 2.5rem;
+            border-radius: 30px;
+            border: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary-custom:hover { background-color: var(--terracotta-light); color: var(--dark); }
+
+        .alert-custom { border-radius: 12px; border: none; font-size: 0.92rem; }
+
+        .divider-dashed {
+            border-top: 2px dashed var(--beige);
+            margin: 1.5rem 0;
+        }
+
+        .separador-firma {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.2rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .separador-firma::before,
+        .separador-firma::after {
+            content: '';
+            flex: 1;
+            border-top: 1px dashed var(--beige);
+        }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="form-container">
+
+                <!-- Header -->
+                <div class="page-header">
+                    <a href="/consentimientos" class="btn-back">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <span class="section-tag"
+                          th:text="${consentimientoId != null} ? 'Editar Consentimiento' : 'Nuevo Consentimiento'">
+                        Consentimiento
+                    </span>
+                    <h2 th:text="${titulo}">Consentimiento Informado</h2>
+                    <p>Documento de consentimiento para donación de sangre</p>
+                </div>
+
+                <!-- Alertas -->
+                <div th:if="${mensajeError}"
+                     class="alert alert-danger alert-custom alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span th:text="${mensajeError}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- CORRECCIÓN: enctype="multipart/form-data" para poder subir imágenes -->
+                <form th:action="${consentimientoId != null}
+                          ? @{/consentimientos/actualizar/{id}(id=${consentimientoId})}
+                          : @{/consentimientos/guardar}"
+                      th:object="${consentimiento}" method="post" enctype="multipart/form-data">
+
+                    <!-- Donante -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-person-fill"></i> Donante
+                        </div>
+                        <div class="card-body-custom">
+                            <label class="form-label">Seleccione el Donante *</label>
+                            <select class="form-select" th:field="*{donanteId}" required>
+                                <option value="">Seleccione...</option>
+                                <option th:each="donante : ${donantes}"
+                                        th:value="${donante.id}"
+                                        th:text="${donante.nombres + ' ' + donante.apellidos + ' - ' + donante.documento}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Consentimiento -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-file-earmark-text-fill"></i> Consentimiento Informado
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="consentimiento-box">
+                                <h5><i class="bi bi-file-earmark-medical me-2"></i>DECLARACIÓN DE CONSENTIMIENTO</h5>
+                                <div class="consentimiento-text">
+                                    <p>Por medio del presente documento, manifiesto que he sido informado(a) sobre el
+                                    procedimiento de donación de sangre, sus beneficios y riesgos potenciales.</p>
+                                    <p><strong>OBJETIVO:</strong> La sangre donada será utilizada para transfusiones
+                                    en pacientes que lo requieran, pudiendo salvar hasta tres vidas con cada donación.</p>
+                                    <p><strong>PROCEDIMIENTO:</strong> La donación es un procedimiento seguro realizado
+                                    por personal capacitado, con material estéril y desechable.</p>
+                                    <p><strong>CONFIDENCIALIDAD:</strong> Toda la información será tratada de manera
+                                    confidencial y utilizada únicamente con fines médicos y estadísticos.</p>
+                                    <p><strong>DERECHOS:</strong> Tengo derecho a hacer preguntas antes, durante y
+                                    después del procedimiento, y a retirar mi consentimiento en cualquier momento.</p>
+                                </div>
+                            </div>
+
+                            <!-- Estado del consentimiento -->
+                            <label class="form-label mt-2">Estado del Consentimiento *</label>
+                            <div class="estado-selector" id="estadoSelector">
+
+                                <div class="estado-option"
+                                     id="optAceptado"
+                                     th:classappend="${consentimiento.aceptaConsentimiento == true} ? 'selected-aceptado' : ''"
+                                     onclick="seleccionarEstado(true)">
+                                    <i class="bi bi-check-circle-fill" style="color: var(--sage-green);"></i>
+                                    <span>Aceptado</span>
+                                </div>
+
+                                <div class="estado-option"
+                                     id="optPendiente"
+                                     th:classappend="${consentimiento.aceptaConsentimiento != true} ? 'selected-pendiente' : ''"
+                                     onclick="seleccionarEstado(false)">
+                                    <i class="bi bi-clock-fill" style="color: var(--terracotta);"></i>
+                                    <span>Pendiente</span>
+                                </div>
+
+                            </div>
+                            <input type="hidden" th:field="*{aceptaConsentimiento}" id="aceptaConsentimientoHidden">
+                        </div>
+                    </div>
+
+                    <!-- Firma -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-pen-fill"></i> Firma del Donante
+                        </div>
+                        <div class="card-body-custom">
+
+                            <!-- Firma actual (solo en edición) -->
+                            <div th:if="${archivoActual != null or firmaActual != null}" class="mb-4">
+    <label class="form-label">Firma Registrada Actualmente</label>
+    <div class="firma-actual-box">
+        <div class="firma-actual-header">
+            <i class="bi bi-shield-check"></i> Firma verificada
+        </div>
+        <div class="firma-actual-body">
+
+            <!-- Archivo imagen subido -->
+            <th:block th:if="${archivoActual != null
+                and (archivoActual.endsWith('.jpg')
+                  or archivoActual.endsWith('.jpeg')
+                  or archivoActual.endsWith('.png')
+                  or archivoActual.endsWith('.gif')
+                  or archivoActual.endsWith('.webp'))}">
+                <img th:src="@{'/' + ${archivoActual}}"
+                     alt="Firma del donante"
+                     style="max-width:100%; max-height:200px; border-radius:8px; object-fit:contain;"/>
+            </th:block>
+
+            <!-- Archivo PDF subido -->
+            <th:block th:if="${archivoActual != null and archivoActual.endsWith('.pdf')}">
+                <a th:href="@{'/' + ${archivoActual}}" target="_blank" class="firma-url-link">
+                    <i class="bi bi-file-earmark-pdf"></i> Ver PDF adjunto
+                </a>
+            </th:block>
+
+            <!-- Firma base64 (de BD original) -->
+            <th:block th:if="${archivoActual == null
+                and firmaActual != null
+                and firmaActual.startsWith('data:image')}">
+                <img th:src="${firmaActual}"
+                     alt="Firma del donante"
+                     style="max-width:100%; max-height:200px; border-radius:8px; object-fit:contain;"/>
+            </th:block>
+
+            <!-- Firma URL externa -->
+            <th:block th:if="${archivoActual == null
+                and firmaActual != null
+                and firmaActual.startsWith('http')}">
+                <a th:href="${firmaActual}" target="_blank" class="firma-url-link">
+                    <i class="bi bi-file-earmark-pdf"></i> Ver documento de firma
+                </a>
+            </th:block>
+
+            <!-- Firma texto simple -->
+            <th:block th:if="${archivoActual == null
+                and firmaActual != null
+                and !firmaActual.startsWith('data:image')
+                and !firmaActual.startsWith('http')}">
+                <span class="firma-texto" th:text="${firmaActual}">Firma</span>
+            </th:block>
+
+        </div>
+    </div>
+</div>
+
+                            <div class="divider-dashed" th:if="${firmaActual != null}"></div>
+
+                            <!-- Opción 1: Firma de texto -->
+                            <label class="form-label">
+                                <span th:text="${firmaActual != null} ? 'Nueva Firma Digital (opcional)' : 'Firma Digital'">
+                                    Firma Digital
+                                </span>
+                            </label>
+                            <input type="text" class="form-control" id="inputFirmaTexto"
+                                   th:field="*{firmaConsentimiento}"
+                                   placeholder="Ingrese nombre completo como firma digital">
+                            <div class="alert alert-info mt-2" style="border-radius:10px; font-size:0.88rem;">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Al ingresar su nombre completo firma digitalmente este documento.
+                                <span th:if="${firmaActual != null}">
+                                    Si deja vacío este campo y no sube imagen, se conservará la firma anterior.
+                                </span>
+                            </div>
+
+                            <!-- Separador O -->
+                            <div class="separador-firma">O sube una imagen / documento</div>
+
+                            <!-- Opción 2: Subir imagen o PDF -->
+                            <label class="form-label">Adjuntar imagen de firma o documento</label>
+                            <div class="file-upload-area" onclick="document.getElementById('archivoFirmaInput').click()">
+                                <i class="bi bi-cloud-upload"></i>
+                                <p><strong>Haz clic para subir</strong> o arrastra el archivo aquí</p>
+                                <p id="fileNameFirma" class="mt-1" style="color: var(--sage-green); font-weight:600;"></p>
+                                <p class="mt-1">Formatos: JPG, PNG, PDF — Máximo 10 MB</p>
+                            </div>
+                            <input type="file" id="archivoFirmaInput" name="archivoConsentimiento"
+                                   accept="image/*,.pdf" style="display:none"
+                                   onchange="onArchivoSeleccionado(this)">
+
+                            <!-- Preview de imagen seleccionada -->
+                            <div class="preview-nueva-imagen" id="previewNuevaImagen">
+                                <div class="preview-header">
+                                    <i class="bi bi-image"></i> Vista previa
+                                </div>
+                                <img id="previewImg" src="" alt="Preview" style="display:none;">
+                                <div class="preview-pdf" id="previewPdf" style="display:none;">
+                                    <i class="bi bi-file-earmark-pdf" style="font-size:1.5rem; color:var(--primary-red);"></i>
+                                    <span id="previewPdfNombre"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between gap-3 mt-2">
+                        <button type="submit" class="btn-custom">
+                            <i class="bi bi-check-circle"></i>
+                            <span th:text="${consentimientoId != null} ? 'Guardar Cambios' : 'Aceptar y Firmar'">Guardar</span>
+                        </button>
+                        <a href="/consentimientos" class="btn-secondary-custom">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="~{fragments/sidebar :: sidebar-js}"></div>
+
+    <script>
+        // ── Estado del consentimiento ────────────────────────────────────
+        function seleccionarEstado(aceptado) {
+            const hidden = document.getElementById('aceptaConsentimientoHidden');
+            const optAceptado = document.getElementById('optAceptado');
+            const optPendiente = document.getElementById('optPendiente');
+
+            hidden.value = aceptado;
+
+            optAceptado.className = 'estado-option' + (aceptado ? ' selected-aceptado' : '');
+            optPendiente.className = 'estado-option' + (!aceptado ? ' selected-pendiente' : '');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const hidden = document.getElementById('aceptaConsentimientoHidden');
+            const val = hidden.value;
+            if (val === 'true') {
+                seleccionarEstado(true);
+            } else if (val === 'false') {
+                seleccionarEstado(false);
+            }
+        });
+
+        // ── Manejo del archivo ───────────────────────────────────────────
+        function onArchivoSeleccionado(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Mostrar nombre en el área de upload
+            document.getElementById('fileNameFirma').textContent = file.name;
+
+            // Si se sube imagen, vaciar el campo de texto (evitar conflicto)
+            document.getElementById('inputFirmaTexto').value = '';
+
+            // Mostrar preview
+            const previewBox = document.getElementById('previewNuevaImagen');
+            const previewImg = document.getElementById('previewImg');
+            const previewPdf = document.getElementById('previewPdf');
+            previewBox.style.display = 'block';
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    previewPdf.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImg.style.display = 'none';
+                previewPdf.style.display = 'flex';
+                document.getElementById('previewPdfNombre').textContent = file.name;
+            }
+        }
+    </script>
+
+</body>
+</html>

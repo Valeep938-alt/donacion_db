@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' - BloodBank SENA'">Formulario - BloodBank SENA</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <div th:replace="~{fragments/sidebar :: sidebar-css}"></div>
+    
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --text-muted: #7A8A7A;
+            --primary-red: #C44536;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+        }
+
+        .form-container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding-bottom: 3rem;
+        }
+
+        .page-header { padding: 2rem 0 1.5rem; }
+
+        .page-header h2 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .page-header p { color: var(--text-muted); font-size: 1rem; }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--beige);
+            color: var(--dark);
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            border: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .btn-back:hover { background: var(--sage-green); color: white; }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(139,157,131,0.12) 0%, rgba(212,165,116,0.12) 100%);
+            border-left: 4px solid var(--sage-green);
+            padding: 1.2rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box h5 { color: var(--dark); font-size: 1rem; margin-bottom: 0.5rem; }
+
+        .info-box ul {
+            margin: 0; padding-left: 1.5rem;
+            color: var(--text-muted); font-size: 0.9rem;
+        }
+
+        .info-box ul li { margin-bottom: 0.2rem; }
+
+        .card-custom {
+            background: var(--warm-white);
+            border-radius: 20px;
+            border: 1px solid var(--beige);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+            color: white;
+            padding: 1.2rem 1.8rem;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header-custom i { font-size: 1.2rem; }
+
+        .card-body-custom { padding: 1.8rem 2rem; }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.4rem;
+            font-size: 0.92rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--beige);
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--cream);
+            font-size: 0.95rem;
+            color: var(--dark);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--sage-green);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(139,157,131,0.15);
+            outline: none;
+        }
+
+        .form-control[readonly] {
+            background-color: var(--beige);
+            cursor: default;
+            color: var(--dark);
+        }
+
+        .form-text { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+        .blood-type-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--beige);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--terracotta-light);
+        }
+
+        .blood-type-badge {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--terracotta) 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(196,69,54,0.25);
+        }
+
+        .blood-type-info { display: flex; flex-direction: column; }
+        .blood-type-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .blood-type-value { font-size: 1.1rem; font-weight: 600; color: var(--dark); }
+        .blood-type-placeholder { color: var(--text-muted); font-style: italic; font-size: 0.95rem; }
+
+        .consentimiento-box {
+            background: linear-gradient(135deg, rgba(139,157,131,0.08) 0%, rgba(212,165,116,0.08) 100%);
+            border: 1px solid var(--beige);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .consentimiento-box h5 {
+            color: var(--primary-red);
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+
+        .consentimiento-box p {
+            font-size: 0.88rem; color: var(--text-muted);
+            line-height: 1.7; margin: 0;
+        }
+
+        .form-check-input {
+            width: 1.3em; height: 1.3em;
+            border: 2px solid var(--beige); cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--sage-green);
+            border-color: var(--sage-green);
+        }
+
+        .form-check-label {
+            font-size: 0.92rem; color: var(--dark); padding-left: 0.3rem;
+        }
+
+        /* File upload */
+        .file-upload-area {
+            border: 2px dashed var(--beige);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            background: var(--cream);
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover { border-color: var(--sage-green); background: white; }
+
+        .file-upload-area i {
+            font-size: 2rem; color: var(--terracotta);
+            margin-bottom: 0.5rem; display: block;
+        }
+
+        .file-upload-area p { color: var(--text-muted); font-size: 0.88rem; margin: 0; }
+
+        /* Preview de imagen subida */
+        .preview-archivo {
+            display: none;
+            margin-top: 1rem;
+            border: 2px solid var(--sage-green);
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .preview-archivo .preview-header {
+            background: rgba(139,157,131,0.1);
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem; font-weight: 600;
+            color: var(--sage-dark);
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+
+        .preview-archivo img {
+            display: block;
+            max-width: 100%; max-height: 200px;
+            margin: 0.8rem auto;
+            border-radius: 8px; object-fit: contain;
+        }
+
+        .preview-archivo .preview-pdf-info {
+            padding: 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            color: var(--text-muted); font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .btn-custom {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+            color: white;
+            padding: 0.85rem 2.5rem;
+            border-radius: 30px; border: none;
+            font-weight: 500; font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139,157,131,0.35);
+            display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139,157,131,0.4);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background-color: var(--beige); color: var(--dark);
+            padding: 0.85rem 2.5rem;
+            border-radius: 30px; border: none;
+            font-weight: 500; font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+
+        .btn-secondary-custom:hover { background-color: var(--terracotta-light); color: var(--dark); }
+
+        .alert-custom { border-radius: 12px; border: none; font-size: 0.92rem; }
+
+        .section-tag {
+            display: inline-block;
+            background: var(--terracotta-light); color: var(--dark);
+            padding: 0.3rem 1rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 500;
+            letter-spacing: 0.5px; margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="form-container">
+
+                <!-- Header -->
+                <div class="page-header">
+                    <a href="/donaciones" class="btn-back">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <span class="section-tag">Nueva Donación</span>
+                    <h2 th:text="${titulo}">Registrar Donación</h2>
+                    <p>Complete la información para registrar la donación de sangre</p>
+                </div>
+
+                <!-- Alerta error -->
+                <div th:if="${mensajeError}" class="alert alert-danger alert-custom alert-dismissible fade show mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span th:text="${mensajeError}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Requisitos -->
+                <div class="info-box">
+                    <h5><i class="bi bi-info-circle me-2"></i>Requisitos para Donar</h5>
+                    <ul>
+                        <li>Edad mínima: 18 años</li>
+                        <li>Peso mínimo: 50 kg</li>
+                        <li>Tiempo entre donaciones: mínimo 3 meses</li>
+                        <li>Consentimiento informado firmado obligatorio</li>
+                    </ul>
+                </div>
+
+                <!-- Formulario -->
+                <form th:action="@{${accion}}" th:object="${donacion}" method="post" enctype="multipart/form-data">
+
+                    <!-- Sección: Donante -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-person-fill"></i>
+                            Selección del Donante
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label">Donante *</label>
+                                    <select class="form-select" th:field="*{donanteId}" id="donanteSelect" required>
+                                        <option value="">Seleccione un donante...</option>
+                                        <option th:each="donante : ${donantes}"
+                                                th:value="${donante.id}"
+                                                th:text="${donante.nombres + ' ' + donante.apellidos + ' - ' + donante.documento}"
+                                                th:attr="data-tipo-sangre=${donante.tipoSangre}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Tipo de sangre visible -->
+                                <div class="col-md-12">
+                                    <label class="form-label">Tipo de Sangre del Donante</label>
+                                    <div class="blood-type-display" id="bloodTypeDisplay">
+                                        <div class="blood-type-badge" id="bloodTypeBadge">
+                                            <i class="bi bi-droplet-fill" id="bloodTypeIcon"></i>
+                                        </div>
+                                        <div class="blood-type-info">
+                                            <span class="blood-type-label">Tipo de sangre</span>
+                                            <span class="blood-type-value blood-type-placeholder" id="bloodTypeValue">
+                                                Seleccione un donante para ver su tipo de sangre
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Donación -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-droplet-fill"></i>
+                            Información de la Donación
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Fecha de Donación *</label>
+                                    <input type="date" class="form-control" th:field="*{fechaDonacion}" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Cantidad (ml) *</label>
+                                    <input type="number" class="form-control" th:field="*{cantidadML}"
+                                           placeholder="Ej: 450" min="350" max="500" value="450" required>
+                                    <div class="form-text">Cantidad estándar: 450 ml</div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Observaciones</label>
+                                    <textarea class="form-control" th:field="*{observaciones}"
+                                              rows="3" placeholder="Ingrese observaciones relevantes..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Consentimiento -->
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <i class="bi bi-file-earmark-check-fill"></i>
+                            Consentimiento Informado
+                        </div>
+                        <div class="card-body-custom">
+                            <div class="consentimiento-box">
+                                <h5><i class="bi bi-file-earmark-medical"></i>DECLARACIÓN DE CONSENTIMIENTO</h5>
+                                <p>
+                                    Por medio del presente documento, el donante manifiesta haber sido informado sobre el
+                                    procedimiento de donación de sangre, sus beneficios y riesgos potenciales. La sangre donada
+                                    será utilizada para transfusiones en pacientes que lo requieran. Toda la información
+                                    proporcionada será tratada de manera confidencial y utilizada únicamente con fines médicos.
+                                </p>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="aceptaConsentimiento"
+                                        id="aceptaConsentimiento" value="true"
+                                        th:checked="${donacionId != null}"
+                                        th:required="${donacionId == null}">
+                                <label class="form-check-label fw-bold" for="aceptaConsentimiento">
+                                    El donante ha leído, comprendido y acepta el consentimiento informado *
+                                </label>
+                            </div>
+
+                            <label class="form-label">Adjuntar documento o imagen de consentimiento</label>
+                            <div class="file-upload-area" onclick="document.getElementById('archivoInput').click()">
+                                <i class="bi bi-cloud-upload"></i>
+                                <p><strong>Haz clic para subir</strong> o arrastra el archivo aquí</p>
+                                <p id="fileName" class="mt-1" style="color: var(--sage-green); font-weight:600;"></p>
+                                <p class="mt-1">Formatos: JPG, PNG, PDF — Máximo 10 MB (Opcional)</p>
+                            </div>
+                            <input type="file" id="archivoInput" name="archivoConsentimiento"
+                                   accept="image/*,.pdf" style="display:none"
+                                   onchange="onArchivoSeleccionado(this)">
+
+                            <!-- Preview del archivo seleccionado -->
+                            <div class="preview-archivo" id="previewArchivo">
+                                <div class="preview-header">
+                                    <i class="bi bi-eye"></i> Vista previa
+                                </div>
+                                <img id="previewImg" src="" alt="Preview" style="display:none;">
+                                <div class="preview-pdf-info" id="previewPdfInfo" style="display:none;">
+                                    <i class="bi bi-file-earmark-pdf" style="font-size:1.5rem; color:var(--primary-red);"></i>
+                                    <span id="previewPdfNombre"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between gap-3 mt-2">
+                        <button type="submit" class="btn-custom">
+                            <i class="bi bi-check-circle"></i> Registrar Donación
+                        </button>
+                        <a href="/donaciones" class="btn-secondary-custom">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="~{fragments/sidebar :: sidebar-js}"></div>
+
+    <script>
+        // ── Tipo de sangre ───────────────────────────────────────────────
+        const donanteSelect = document.getElementById('donanteSelect');
+        const bloodTypeValue = document.getElementById('bloodTypeValue');
+        const bloodTypeBadge = document.getElementById('bloodTypeBadge');
+
+        donanteSelect.addEventListener('change', function () {
+            const selected = this.options[this.selectedIndex];
+            const tipoSangre = selected.getAttribute('data-tipo-sangre');
+
+            if (tipoSangre) {
+                bloodTypeValue.classList.remove('blood-type-placeholder');
+                bloodTypeValue.textContent = tipoSangre;
+                bloodTypeBadge.innerHTML = `<span style="font-size:1.1rem;font-weight:700;">${tipoSangre}</span>`;
+                bloodTypeBadge.style.background = 'linear-gradient(135deg, #C44536 0%, #D4A574 100%)';
+            } else {
+                bloodTypeValue.classList.add('blood-type-placeholder');
+                bloodTypeValue.textContent = 'Seleccione un donante para ver su tipo de sangre';
+                bloodTypeBadge.innerHTML = '<i class="bi bi-droplet-fill"></i>';
+                bloodTypeBadge.style.background = 'linear-gradient(135deg, #8B9D83 0%, #D4A574 100%)';
+            }
+        });
+
+        // ── Preview de archivo ───────────────────────────────────────────
+        function onArchivoSeleccionado(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            document.getElementById('fileName').textContent = file.name;
+
+            const previewBox = document.getElementById('previewArchivo');
+            const previewImg = document.getElementById('previewImg');
+            const previewPdf = document.getElementById('previewPdfInfo');
+
+            previewBox.style.display = 'block';
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    previewPdf.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImg.style.display = 'none';
+                previewPdf.style.display = 'flex';
+                document.getElementById('previewPdfNombre').textContent = file.name;
+            }
+        }
+    </script>
+
+</body>
+</html>

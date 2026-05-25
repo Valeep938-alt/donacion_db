@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodBank SENA - Donación de Sangre</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --text-muted: #7A8A7A;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5, h6 { 
+            font-family: 'Playfair Display', serif; 
+            font-weight: 500;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background-color: var(--sage-green);
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
+        }
+        .top-bar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 0.8rem;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+        .top-bar a:hover { opacity: 1; }
+        .top-bar i { margin-right: 0.3rem; }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--warm-white);
+            box-shadow: 0 1px 15px rgba(0,0,0,0.04);
+            padding: 1.2rem 0;
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            font-weight: 600;
+            color: var(--dark) !important;
+            letter-spacing: -0.5px;
+        }
+        .navbar-brand i { 
+            color: var(--terracotta); 
+            margin-right: 0.5rem; 
+            font-size: 1.4rem;
+        }
+        .nav-link {
+            color: var(--dark) !important;
+            font-weight: 400;
+            margin: 0 0.3rem;
+            padding: 0.5rem 1.2rem !important;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--beige);
+            color: var(--sage-dark) !important;
+        }
+        .btn-login {
+            background: var(--terracotta);
+            color: white;
+            padding: 0.6rem 1.8rem;
+            border-radius: 25px;
+            border: none;
+            font-weight: 500;
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        .btn-login:hover {
+            background: var(--sage-green);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--cream) 0%, var(--beige) 100%);
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139,157,131,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4rem;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-text { flex: 1; }
+        .hero-image {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        .hero-image img {
+            max-width: 380px;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.1);
+        }
+        .hero-image::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 20px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 50%;
+            filter: blur(10px);
+        }
+        .hero-tag {
+            display: inline-block;
+            background: var(--terracotta-light);
+            color: var(--dark);
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+        .hero-title {
+            font-size: 3.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 1.2rem;
+            line-height: 1.15;
+        }
+        .hero-title span { 
+            color: var(--terracotta); 
+            font-style: italic;
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--sage-green);
+            margin-bottom: 1.2rem;
+            font-weight: 400;
+        }
+        .hero-description {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            max-width: 90%;
+        }
+        .btn-custom {
+            background: var(--terracotta);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            border: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            letter-spacing: 0.5px;
+        }
+        .btn-custom:hover {
+            background: var(--sage-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139,157,131,0.3);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--dark);
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            border: 2px solid var(--beige);
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            background: var(--beige);
+            color: var(--dark);
+        }
+
+        /* Section Divider */
+        .section-divider {
+            text-align: center;
+            padding: 4rem 0 2rem;
+            background: var(--warm-white);
+        }
+        .section-divider h2 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 0.8rem;
+        }
+        .section-divider p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        /* Features */
+        .features-section {
+            padding: 3rem 0 5rem;
+            background: var(--warm-white);
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+        }
+        .feature-card {
+            background: var(--warm-white);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid var(--beige);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+            border-color: var(--terracotta-light);
+        }
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--terracotta) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 1.6rem;
+        }
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+        }
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--beige) 100%);
+        }
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+        .about-image {
+            flex: 1;
+            position: relative;
+        }
+        .about-image img {
+            width: 100%;
+            max-width: 450px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+        .about-image::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--terracotta);
+            border-radius: 20px;
+            z-index: -1;
+        }
+        .about-text { flex: 1; }
+        .about-tag {
+            display: inline-block;
+            color: var(--terracotta);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        .about-text h2 {
+            font-size: 2.2rem;
+            color: var(--dark);
+            margin-bottom: 1.2rem;
+            line-height: 1.2;
+        }
+        .about-text p {
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            font-size: 1.02rem;
+            line-height: 1.8;
+        }
+        .about-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .about-stat {
+            text-align: center;
+        }
+        .about-stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--terracotta);
+        }
+        .about-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Process Section */
+        .process-section {
+            padding: 5rem 0;
+            background: var(--warm-white);
+        }
+        .process-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .process-header h2 {
+            font-size: 2.2rem;
+            color: var(--dark);
+            margin-bottom: 0.8rem;
+        }
+        .process-header p {
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+        }
+        .process-card {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+        .process-card:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -1rem;
+            width: 2rem;
+            height: 2px;
+            background: var(--beige);
+        }
+        .process-number {
+            width: 60px;
+            height: 60px;
+            background: var(--terracotta-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--terracotta);
+        }
+        .process-card h4 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        .process-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Services Section */
+        .services-section {
+            padding: 5rem 0;
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+            color: white;
+        }
+        .services-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .services-header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+        }
+        .services-header p {
+            opacity: 0.85;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .service-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        .service-card:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-5px);
+        }
+        .service-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1.2rem;
+            display: block;
+        }
+        .service-card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+        .service-card p {
+            opacity: 0.85;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .service-card .btn-service {
+            display: inline-block;
+            margin-top: 1.2rem;
+            padding: 0.6rem 1.5rem;
+            background: white;
+            color: var(--sage-dark);
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .btn-service:hover {
+            background: var(--terracotta);
+            color: white;
+        }
+
+        /* Blood Types Section */
+        .blood-types-section {
+            padding: 5rem 0;
+            background: var(--cream);
+        }
+        .blood-types-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .blood-types-header h2 {
+            font-size: 2.2rem;
+            color: var(--dark);
+            margin-bottom: 0.8rem;
+        }
+        .blood-types-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .blood-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .blood-type-item {
+            background: var(--warm-white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--beige);
+            transition: all 0.3s ease;
+        }
+        .blood-type-item:hover {
+            border-color: var(--terracotta);
+            transform: scale(1.05);
+        }
+        .blood-type-item i {
+            font-size: 2rem;
+            color: var(--terracotta);
+            margin-bottom: 0.5rem;
+        }
+        .blood-type-item h5 {
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+        .blood-type-item span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Newsletter Section */
+        .newsletter-section {
+            padding: 4rem 0;
+            background: var(--beige);
+            text-align: center;
+        }
+        .newsletter-section h3 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        .newsletter-section p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        .newsletter-form {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .newsletter-form input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--cream);
+            border-radius: 30px;
+            background: white;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .newsletter-form input:focus {
+            border-color: var(--terracotta);
+        }
+        .newsletter-form button {
+            padding: 0.8rem 2rem;
+            background: var(--terracotta);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .newsletter-form button:hover {
+            background: var(--sage-green);
+        }
+
+        /* Stats */
+        .stats-section {
+            background: var(--sage-green);
+            padding: 4rem 0;
+            color: white;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: white;
+            font-family: 'Playfair Display', serif;
+        }
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.85;
+            margin-top: 0.5rem;
+            font-weight: 300;
+        }
+
+        /* Testimonials */
+        .testimonials-section {
+            padding: 5rem 0;
+            background: var(--warm-white);
+        }
+        .testimonials-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .testimonials-header h2 {
+            font-size: 2.2rem;
+            color: var(--dark);
+        }
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .testimonial-card {
+            background: var(--cream);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--beige);
+        }
+        .testimonial-card i {
+            font-size: 2rem;
+            color: var(--terracotta);
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .testimonial-card p {
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--sage-green), var(--terracotta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        .testimonial-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .testimonial-role {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--cream);
+            padding: 3rem 0 2rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .footer-brand i { color: var(--terracotta); margin-right: 0.5rem; }
+        .footer-desc {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.7;
+        }
+        .footer-links h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--terracotta-light);
+        }
+        .footer-links a {
+            display: block;
+            color: var(--cream);
+            opacity: 0.7;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            transition: opacity 0.3s;
+        }
+        .footer-links a:hover { opacity: 1; }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1.5rem;
+            text-align: center;
+        }
+        .footer-bottom .sena-badge {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .footer-bottom p {
+            opacity: 0.6;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content, .about-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+            .hero-title { font-size: 2.2rem; }
+            .hero-description { max-width: 100%; }
+            .hero-image img { max-width: 280px; }
+            .about-image::before { display: none; }
+            .about-stats { justify-content: center; }
+            .newsletter-form { flex-direction: column; }
+            .process-card:not(:last-child)::after { display: none; }
+            .services-grid, .testimonials-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container d-flex justify-content-center">
+            <a href="tel:+573001234567"><i class="bi bi-telephone"></i>+57 300 123 4567</a>
+            <a href="mailto:contacto@bloodbank.sena"><i class="bi bi-envelope"></i>contacto@bloodbank.sena</a>
+            <a href="#"><i class="bi bi-geo-alt"></i>SENA CIMM - Boyacá</a>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-droplet-fill"></i>
+                BloodBank SENA
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">Nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#process">Proceso</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#blood-types">Tipos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contacto</a></li>
+                </ul>
+                <a href="/login" class="btn btn-login">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-tag">
+                        <i class="bi bi-heart-pulse me-1"></i>Sistema de Gestión de Donación
+                    </div>
+                    <h1 class="hero-title">
+                        Tu donación puede <span>salvar vidas</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Únete a nuestra comunidad de donantes
+                    </p>
+                    <p class="hero-description">
+                        En BloodBank SENA gestionamos cada donación con el máximo cuidado y profesionalismo. 
+                        Cada gota cuenta: una sola donación puede salvar hasta tres vidas. 
+                        Regístrate hoy y conviértete en parte de esta cadena de esperanza.
+                    </p>
+                    <div>
+                        <a href="/login" class="btn btn-custom">
+                            <i class="bi bi-person-plus me-2"></i>Quiero Donar
+                        </a>
+                        <a href="#process" class="btn btn-outline">
+                            <i class="bi bi-info-circle me-2"></i>Conoce el Proceso
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.fineartamerica.com/images/artworkimages/medium/3/snoopy-doctor-surya-siregar-transparent.png" 
+                         alt="Snoopy Doctor" 
+                         style="max-width: 380px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Divider -->
+    <div class="section-divider">
+        <div class="container">
+            <h2>Tu gesto hace la diferencia</h2>
+            <p>Cada donación es un acto de amor que puede marcar la diferencia en la vida de personas que lo necesitan urgentemente</p>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <section class="features-section" id="info">
+        <div class="container">
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-heart-pulse"></i>
+                    </div>
+                    <h3>Salva Vidas</h3>
+                    <p>Una sola donación de sangre puede ayudar a hasta 3 pacientes en emergencias médicas, cirugías complejas y tratamientos oncológicos.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3>Proceso Seguro</h3>
+                    <p>Todo el proceso sigue protocolos internacionales de bioseguridad. Material estéril de un solo uso y personal altamente capacitado.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <h3>Rápido y Sencillo</h3>
+                    <p>La donación completa toma aproximadamente 45 minutos. Desde el registro hasta la recuperación, te acompañamos en cada paso.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h3>Comunidad de Héroes</h3>
+                    <p>Únete a nuestra red de donantes activos. Recibe recordatorios, certificados de donación y acceso a eventos especiales.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&h=600&fit=crop" 
+                         alt="Equipo médico" 
+                         onerror="this.src='https://cdn.pixabay.com/photo/2020/07/01/12/42/icon-5359553_960_720.png'">
+                </div>
+                <div class="about-text">
+                    <div class="about-tag">Nuestra Historia</div>
+                    <h2>Conoce BloodBank SENA</h2>
+                    <p>
+                        Somos el sistema de gestión de donación de sangre del <strong>SENA CIMM</strong>, 
+                        diseñado para conectar donantes con quienes más lo necesitan. Nuestra plataforma 
+                        digitaliza todo el proceso: desde el registro del donante hasta la trazabilidad 
+                        de cada unidad de sangre en el inventario.
+                    </p>
+                    <p>
+                        Trabajamos con los más altos estándares de calidad, garantizando que cada donación 
+                        sea segura, rastreable y llegue al paciente correcto en el momento indicado. 
+                        Nuestro compromiso es con la vida.
+                    </p>
+                    <div class="about-stats">
+                        <div class="about-stat">
+                            <div class="about-stat-number">5+</div>
+                            <div class="about-stat-label">Años de experiencia</div>
+                        </div>
+                        <div class="about-stat">
+                            <div class="about-stat-number">100%</div>
+                            <div class="about-stat-label">Trazabilidad</div>
+                        </div>
+                        <div class="about-stat">
+                            <div class="about-stat-number">24/7</div>
+                            <div class="about-stat-label">Disponibilidad</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section" id="process">
+        <div class="container">
+            <div class="process-header">
+                <h2>¿Cómo funciona?</h2>
+                <p>El proceso de donación en 4 sencillos pasos</p>
+            </div>
+            <div class="process-grid">
+                <div class="process-card">
+                    <div class="process-number">1</div>
+                    <h4>Regístrate</h4>
+                    <p>Crea tu cuenta en nuestro sistema con tus datos personales y de contacto</p>
+                </div>
+                <div class="process-card">
+                    <div class="process-number">2</div>
+                    <h4>Evaluación</h4>
+                    <p>Completa el cuestionario de salud y pasa la revisión médica previa</p>
+                </div>
+                <div class="process-card">
+                    <div class="process-number">3</div>
+                    <h4>Donación</h4>
+                    <p>El proceso toma 10-15 minutos. Extraemos aproximadamente 450ml de sangre</p>
+                </div>
+                <div class="process-card">
+                    <div class="process-number">4</div>
+                    <h4>Recuperación</h4>
+                    <p>Descansa unos minutos, recibe tu certificado y vuelve en 3-4 meses</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="container">
+            <div class="services-header">
+                <h2>Nuestros Servicios</h2>
+                <p>Gestión integral de la cadena de donación de sangre</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <i class="bi bi-person-vcard"></i>
+                    <h4>Gestión de Donantes</h4>
+                    <p>Registro completo de donantes con historial médico, seguimiento de donaciones y recordatorios automáticos para próximas donaciones.</p>
+                    <a href="#" class="btn-service">Ver más</a>
+                </div>
+                <div class="service-card">
+                    <i class="bi bi-droplet"></i>
+                    <h4>Control de Donaciones</h4>
+                    <p>Registro detallado de cada donación: volumen, tipo de sangre, fecha, resultado de pruebas y destino de la unidad.</p>
+                    <a href="#" class="btn-service">Ver más</a>
+                </div>
+                <div class="service-card">
+                    <i class="bi bi-box-seam"></i>
+                    <h4>Inventario en Tiempo Real</h4>
+                    <p>Monitoreo constante del stock de sangre por tipo Rh. Alertas automáticas cuando los niveles están bajos.</p>
+                    <a href="#" class="btn-service">Ver más</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blood Types Section -->
+    <section class="blood-types-section" id="blood-types">
+        <div class="container">
+            <div class="blood-types-header">
+                <h2>Tipos de Sangre que Gestionamos</h2>
+                <p>Cada tipo de sangre es valioso y necesario. Conoce los que manejamos en nuestro banco de sangre</p>
+            </div>
+            <div class="blood-types-grid">
+                <div class="blood-type-item">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h5>A+</h5>
+                    <span>Rh Positivo</span>
+                </div>
+                <div class="blood-type-item">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h5>A-</h5>
+                    <span>Rh Negativo</span>
+                </div>
+                <div class="blood-type-item">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h5>B+</h5>
+                    <span>Rh Positivo</span>
+                </div>
+                <div class="blood-type-item">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h5>B-</h5>
+                    <span>Rh Negativo</span>
+                </div>
+                <div class="blood-type-item">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h5>AB+</h5>
+                    <span>Rh Positivo</span>
+                </div>
+                <div class="blood-type-item">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h5>AB-</h5>
+                    <span>Rh Negativo</span>
+                </div>
+                <div class="blood-type-item">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h5>O+</h5>
+                    <span>Rh Positivo</span>
+                </div>
+                <div class="blood-type-item">
+                    <i class="bi bi-droplet-fill"></i>
+                    <h5>O-</h5>
+                    <span>Rh Negativo</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">1,234</div>
+                        <div class="stat-label">Donantes Activos</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">3,456</div>
+                        <div class="stat-label">Donaciones Realizadas</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Tipos de Sangre</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Vidas Salvadas</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="testimonials-header">
+                <h2>Lo que dicen nuestros donantes</h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <i class="bi bi-quote"></i>
+                    <p>"Donar sangre en BloodBank SENA fue una experiencia increíble. El personal me hizo sentir cómodo en todo momento y el proceso fue muy rápido."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">ML</div>
+                        <div>
+                            <div class="testimonial-name">María López</div>
+                            <div class="testimonial-role">Donante desde 2023</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <i class="bi bi-quote"></i>
+                    <p>"Como médico, valoro enormemente la trazabilidad del sistema. Saber exactamente de dónde viene cada unidad de sangre da mucha tranquilidad."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">CR</div>
+                        <div>
+                            <div class="testimonial-name">Dr. Carlos Ruiz</div>
+                            <div class="testimonial-role">Médico Cirujano</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <i class="bi bi-quote"></i>
+                    <p>"La plataforma me envía recordatorios cuando puedo donar de nuevo. Es genial tener todo organizado y saber que mi donación llega a quien la necesita."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">AG</div>
+                        <div>
+                            <div class="testimonial-name">Andrea Gómez</div>
+                            <div class="testimonial-role">Donante frecuente</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter-section" id="contact">
+        <div class="container">
+            <h3>Mantente informado</h3>
+            <p>Recibe noticias sobre campañas de donación y eventos especiales</p>
+            <form class="newsletter-form">
+                <input type="text" placeholder="Tu nombre" required>
+                <input type="email" placeholder="Tu correo electrónico" required>
+                <button type="submit">Suscribirme</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">
+                        <i class="bi bi-droplet-fill"></i>BloodBank SENA
+                    </div>
+                    <p class="footer-desc">
+                        Sistema de gestión de donación de sangre del Centro Industrial de Mantenimiento 
+                        y Manufactura. Comprometidos con salvar vidas a través de la tecnología.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h5>Enlaces Rápidos</h5>
+                    <a href="#">Inicio</a>
+                    <a href="#about">Nosotros</a>
+                    <a href="#process">Proceso de Donación</a>
+                    <a href="#services">Servicios</a>
+                    <a href="/login">Ingresar al Sistema</a>
+                </div>
+                <div class="footer-links">
+                    <h5>Servicios</h5>
+                    <a href="#">Gestión de Donantes</a>
+                    <a href="#">Control de Donaciones</a>
+                    <a href="#">Inventario de Sangre</a>
+                    <a href="#">Consentimientos</a>
+                </div>
+                <div class="footer-links">
+                    <h5>Contacto</h5>
+                    <a href="tel:+573001234567"><i class="bi bi-telephone me-2"></i>+57 300 123 4567</a>
+                    <a href="mailto:contacto@bloodbank.sena"><i class="bi bi-envelope me-2"></i>contacto@bloodbank.sena</a>
+                    <a href="#"><i class="bi bi-geo-alt me-2"></i>SENA CIMM, Boyacá</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="sena-badge">
+                    <i class="bi bi-mortarboard-fill me-2"></i>SENA CIMM
+                </div>
+                <p class="mb-2">Centro Industrial de Mantenimiento y Manufactura</p>
+                <p class="mb-0">&copy; 2026 BloodBank SENA. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

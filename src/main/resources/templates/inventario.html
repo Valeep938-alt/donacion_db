@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' - BloodBank SENA'">Inventario - BloodBank SENA</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <div th:replace="~{fragments/sidebar :: sidebar-css}"></div>
+
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --text-muted: #7A8A7A;
+            --danger: #C44536;
+            --success: #5a8a5a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 991.98px) {
+            .main-content { margin-left: 0; padding: 1rem; }
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--beige);
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(90, 138, 90, 0.1);
+            color: var(--success);
+            border-radius: 20px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats-bar { grid-template-columns: 1fr; }
+        }
+
+        .stat-mini {
+            background: var(--warm-white);
+            border-radius: 16px;
+            padding: 1.2rem;
+            border: 1px solid var(--beige);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-mini-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .stat-mini:nth-child(1) .stat-mini-icon { background: rgba(139, 157, 131, 0.15); color: var(--sage-green); }
+        .stat-mini:nth-child(2) .stat-mini-icon { background: rgba(212, 165, 116, 0.15); color: var(--terracotta); }
+        .stat-mini:nth-child(3) .stat-mini-icon { background: rgba(107, 125, 99, 0.15); color: var(--sage-dark); }
+
+        .stat-mini-info h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .stat-mini-info span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            background: var(--warm-white);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--beige);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            color: var(--dark);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .search-input {
+            padding: 0.6rem 1rem;
+            border: 2px solid var(--beige);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            min-width: 200px;
+            background: var(--cream);
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--terracotta);
+            background: white;
+        }
+
+        .filter-select {
+            padding: 0.6rem 2rem 0.6rem 1rem;
+            border: 2px solid var(--beige);
+            border-radius: 12px;
+            background: var(--cream);
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B9D83' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--terracotta);
+            background: white;
+        }
+
+        .btn-filter-reset {
+            padding: 0.6rem 1rem;
+            background: var(--beige);
+            border: none;
+            border-radius: 12px;
+            color: var(--dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-filter-reset:hover {
+            background: var(--sage-green);
+            color: white;
+        }
+
+        .results-count {
+            margin-left: auto;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .results-count strong {
+            color: var(--terracotta);
+            font-weight: 600;
+        }
+
+        /* ===== INVENTORY GRID ===== */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1400px) {
+            .inventory-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 991.98px) {
+            .inventory-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 576px) {
+            .inventory-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ===== BLOOD CARDS ===== */
+        .blood-type-card {
+            background: var(--warm-white);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid var(--beige);
+            border-top: 4px solid var(--beige);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blood-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+        }
+
+        .blood-type-card.positive { border-top-color: var(--terracotta); }
+        .blood-type-card.negative { border-top-color: var(--sage-green); }
+
+        .blood-type-card.filtered {
+            display: none;
+        }
+
+        .blood-type-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .positive .blood-type-icon {
+            background: linear-gradient(135deg, var(--terracotta) 0%, #c49460 100%);
+        }
+
+        .negative .blood-type-icon {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+        }
+
+        .blood-type-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .blood-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0.75rem 0;
+            line-height: 1;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .blood-amount-unit {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .blood-bar {
+            height: 8px;
+            background: var(--beige);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .blood-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+
+        .positive .blood-bar-fill {
+            background: linear-gradient(90deg, var(--terracotta-light), var(--terracotta));
+        }
+
+        .negative .blood-bar-fill {
+            background: linear-gradient(90deg, #b0c5a8, var(--sage-green));
+        }
+
+        .card-meta {
+            margin-top: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* ===== SKELETON ===== */
+        .skeleton-card {
+            background: var(--warm-white);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--beige);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton-line {
+            height: 14px;
+            background: var(--beige);
+            border-radius: 7px;
+            margin: 8px auto;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== LEGEND ===== */
+        .legend-section {
+            background: var(--warm-white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--beige);
+            text-align: center;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--beige);
+        }
+
+        .empty-state h5 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .results-count {
+                margin-left: 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Inventario de Sangre</h1>
+                <p>Control y disponibilidad de unidades sanguíneas</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="live-badge">
+                    <span class="live-dot"></span>
+                    En tiempo real
+                </span>
+                <span class="text-muted small" id="lastUpdate">—</span>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-mini">
+                <div class="stat-mini-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4 id="statTipos">—</h4>
+                    <span>Tipos de Sangre</span>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon">
+                    <i class="bi bi-droplet"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4 id="statTotal">— ml</h4>
+                    <span>Total Disponible</span>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4 id="statCobertura">—%</h4>
+                    <span>Tipos con Stock</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label class="filter-label" for="searchFilter"><i class="bi bi-search"></i></label>
+                <input type="text"
+                       id="searchFilter"
+                       class="search-input"
+                       placeholder="Buscar tipo de sangre..."
+                       autocomplete="off">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="rhFilter">Rh:</label>
+                <select id="rhFilter" class="filter-select">
+                    <option value="">Todos</option>
+                    <option value="positive">Positivo (+)</option>
+                    <option value="negative">Negativo (-)</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="stockFilter">Stock:</label>
+                <select id="stockFilter" class="filter-select">
+                    <option value="">Todos</option>
+                    <option value="available">Con stock</option>
+                    <option value="empty">Sin stock</option>
+                </select>
+            </div>
+
+            <button class="btn-filter-reset" id="resetFilters">
+                <i class="bi bi-x-circle"></i>
+                Limpiar
+            </button>
+
+            <span class="results-count">
+                Mostrando <strong id="visibleCount">8</strong> de <strong>8</strong> tipos
+            </span>
+        </div>
+
+        <!-- Inventory Grid -->
+        <div class="inventory-grid" id="inventoryGrid">
+            <div class="skeleton-card" th:each="i : ${#numbers.sequence(1, 8)}">
+                <div class="skeleton-line" style="width:70px;height:70px;border-radius:50%;margin:0 auto 1rem;"></div>
+                <div class="skeleton-line" style="width:60%;"></div>
+                <div class="skeleton-line" style="width:40%;height:20px;margin-top:1rem;"></div>
+                <div class="skeleton-line" style="width:100%;height:8px;margin-top:1rem;border-radius:4px;"></div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend-section">
+            <div class="d-inline-flex gap-4 flex-wrap justify-content-center align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:18px;height:18px;background:var(--terracotta);border-radius:4px;"></div>
+                    <span>Rh Positivo</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:18px;height:18px;background:var(--sage-green);border-radius:4px;"></div>
+                    <span>Rh Negativo</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-arrow-repeat text-muted"></i>
+                    <span class="text-muted small">Se refresca cada 30 segundos</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="~{fragments/sidebar :: sidebar-js}"></div>
+
+    <script>
+    // ═══════════════════════════════════════════════════════════
+    //  INVENTARIO – carga dinámica + filtros
+    // ═══════════════════════════════════════════════════════════
+
+    const TODOS_LOS_TIPOS = [
+        { enum: 'O_POSITIVO',  label: 'O+',  descripcion: 'O Positivo',  positivo: true  },
+        { enum: 'O_NEGATIVO',  label: 'O-',  descripcion: 'O Negativo',  positivo: false },
+        { enum: 'A_POSITIVO',  label: 'A+',  descripcion: 'A Positivo',  positivo: true  },
+        { enum: 'A_NEGATIVO',  label: 'A-',  descripcion: 'A Negativo',  positivo: false },
+        { enum: 'B_POSITIVO',  label: 'B+',  descripcion: 'B Positivo',  positivo: true  },
+        { enum: 'B_NEGATIVO',  label: 'B-',  descripcion: 'B Negativo',  positivo: false },
+        { enum: 'AB_POSITIVO', label: 'AB+', descripcion: 'AB Positivo', positivo: true  },
+        { enum: 'AB_NEGATIVO', label: 'AB-', descripcion: 'AB Negativo', positivo: false },
+    ];
+
+    const DESCRIPCION_MAP = {};
+    TODOS_LOS_TIPOS.forEach(t => {
+        DESCRIPCION_MAP[t.enum] = t;
+        DESCRIPCION_MAP[t.label] = t;
+        DESCRIPCION_MAP[t.descripcion] = t;
+    });
+
+    let maxVolumen = 1000;
+    let inventarioActual = [];
+
+    function resolverTipo(item) {
+        const ts = item.tipoSangre;
+        if (!ts) return null;
+        if (typeof ts === 'object') {
+            return DESCRIPCION_MAP[ts.name] || DESCRIPCION_MAP[ts.descripcion] || null;
+        }
+        return DESCRIPCION_MAP[ts] || null;
+    }
+
+    function formatearFecha(dateArr) {
+        if (!dateArr) return 'Hoy';
+        if (Array.isArray(dateArr)) {
+            const [y, m, d] = dateArr;
+            return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`;
+        }
+        if (typeof dateArr === 'string') {
+            const parts = dateArr.split('-');
+            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            return dateArr;
+        }
+        return 'Hoy';
+    }
+
+    function crearTarjeta(meta, volumen, fecha) {
+        const clase = meta.positivo ? 'positive' : 'negative';
+        const pct = Math.min((volumen / maxVolumen) * 100, 100).toFixed(1);
+
+        return `
+        <div class="blood-type-card ${clase}"
+             data-rh="${meta.positivo ? 'positive' : 'negative'}"
+             data-stock="${volumen > 0 ? 'available' : 'empty'}"
+             data-search="${meta.label.toLowerCase()} ${meta.descripcion.toLowerCase()}">
+            <div class="blood-type-icon">${meta.label}</div>
+            <div class="blood-type-label">${meta.descripcion}</div>
+            <div class="blood-amount">
+                ${Math.round(volumen).toLocaleString('es-CO')}
+                <span class="blood-amount-unit">ml</span>
+            </div>
+            <div class="blood-bar">
+                <div class="blood-bar-fill" style="width: ${pct}%"></div>
+            </div>
+            <div class="card-meta">
+                <i class="bi bi-clock me-1"></i>
+                Actualizado: ${formatearFecha(fecha)}
+            </div>
+        </div>`;
+    }
+
+    function crearSkeletons(n) {
+        return Array.from({length: n}, () => `
+        <div class="skeleton-card">
+            <div class="skeleton-line" style="width:70px;height:70px;border-radius:50%;margin:0 auto 1rem;"></div>
+            <div class="skeleton-line" style="width:60%;"></div>
+            <div class="skeleton-line" style="width:40%;height:20px;margin-top:1rem;"></div>
+            <div class="skeleton-line" style="width:100%;height:8px;margin-top:1rem;border-radius:4px;"></div>
+        </div>`).join('');
+    }
+
+    function aplicarFiltros() {
+        const searchTerm = document.getElementById('searchFilter').value.toLowerCase().trim();
+        const rhFilter = document.getElementById('rhFilter').value;
+        const stockFilter = document.getElementById('stockFilter').value;
+
+        const cards = document.querySelectorAll('.blood-type-card');
+        let visibles = 0;
+
+        cards.forEach(card => {
+            const cardSearch = card.dataset.search || '';
+            const cardRh = card.dataset.rh;
+            const cardStock = card.dataset.stock;
+
+            const matchSearch = !searchTerm || cardSearch.includes(searchTerm);
+            const matchRh = !rhFilter || cardRh === rhFilter;
+            const matchStock = !stockFilter || cardStock === stockFilter;
+
+            if (matchSearch && matchRh && matchStock) {
+                card.classList.remove('filtered');
+                visibles++;
+            } else {
+                card.classList.add('filtered');
+            }
+        });
+
+        document.getElementById('visibleCount').textContent = visibles;
+
+        const grid = document.getElementById('inventoryGrid');
+        let emptyMsg = grid.querySelector('.empty-state');
+
+        if (visibles === 0 && cards.length > 0) {
+            if (!emptyMsg) {
+                emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-state';
+                emptyMsg.innerHTML = `
+                    <i class="bi bi-funnel"></i>
+                    <h5 class="mb-2">Sin resultados</h5>
+                    <p class="text-muted mb-0">Intenta ajustar los filtros de búsqueda</p>
+                `;
+                grid.appendChild(emptyMsg);
+            }
+        } else if (emptyMsg) {
+            emptyMsg.remove();
+        }
+    }
+
+    async function cargarInventario(primeraCarga = false) {
+        const grid = document.getElementById('inventoryGrid');
+
+        if (primeraCarga) {
+            grid.innerHTML = crearSkeletons(8);
+        }
+
+        try {
+            const resp = await fetch('/api/inventario', {
+                headers: { 'Accept': 'application/json' },
+                cache: 'no-store'
+            });
+
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+            const datos = await resp.json();
+
+            const apiMap = {};
+            datos.forEach(item => {
+                const meta = resolverTipo(item);
+                if (meta) {
+                    apiMap[meta.enum] = {
+                        volumen: item.volumenDisponibleML ?? 0,
+                        fecha: item.fechaActualizacion
+                    };
+                }
+            });
+
+            inventarioActual = TODOS_LOS_TIPOS.map(meta => ({
+                meta,
+                volumen: apiMap[meta.enum]?.volumen ?? 0,
+                fecha: apiMap[meta.enum]?.fecha ?? null
+            }));
+
+            const vols = inventarioActual.map(r => r.volumen);
+            maxVolumen = Math.max(...vols, 1000);
+
+            grid.innerHTML = inventarioActual.map(r =>
+                crearTarjeta(r.meta, r.volumen, r.fecha)
+            ).join('');
+
+            const totalVol = inventarioActual.reduce((s, r) => s + r.volumen, 0);
+            const conStock = inventarioActual.filter(r => r.volumen > 0).length;
+            const cobertura = Math.round((conStock / inventarioActual.length) * 100);
+
+            document.getElementById('statTipos').textContent = inventarioActual.length;
+            document.getElementById('statTotal').textContent = totalVol.toLocaleString('es-CO') + ' ml';
+            document.getElementById('statCobertura').textContent = cobertura + '%';
+
+            const ahora = new Date();
+            document.getElementById('lastUpdate').textContent = ahora.toLocaleTimeString('es-CO');
+
+            aplicarFiltros();
+
+        } catch (err) {
+            console.error('Error cargando inventario:', err);
+            if (primeraCarga) {
+                grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-wifi-off"></i>
+                    <h5 class="mb-2">Error de conexión</h5>
+                    <p class="text-muted mb-0">Reintentando en 30 segundos...</p>
+                </div>`;
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarInventario(true);
+        setInterval(() => cargarInventario(false), 30_000);
+
+        document.getElementById('searchFilter').addEventListener('input', aplicarFiltros);
+        document.getElementById('rhFilter').addEventListener('change', aplicarFiltros);
+        document.getElementById('stockFilter').addEventListener('change', aplicarFiltros);
+
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            document.getElementById('searchFilter').value = '';
+            document.getElementById('rhFilter').value = '';
+            document.getElementById('stockFilter').value = '';
+            aplicarFiltros();
+        });
+    });
+    </script>
+</body>
+</html>

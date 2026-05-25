@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Consentimiento #' + ${consentimiento.id} + ' - BloodBank SENA'">Detalle Consentimiento</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <div th:replace="~{fragments/sidebar :: sidebar-css}"></div>
+
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --text-muted: #7A8A7A;
+            --danger: #C44536;
+            --danger-light: #FDE8E6;
+            --success: #5a8a5a;
+            --warning: #d4a017;
+            --gold: #C9A96E;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 { 
+            font-family: 'Playfair Display', serif; 
+            font-weight: 500;
+        }
+
+        /* ===== FONDO BLUR - Lista de consentimientos difuminada ===== */
+        .backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(61, 74, 61, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        /* ===== MODAL CARD ===== */
+        .modal-card {
+            background: var(--warm-white);
+            border-radius: 24px;
+            border: 1px solid var(--beige);
+            box-shadow: 0 25px 60px rgba(61, 74, 61, 0.25);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+            animation: modalIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ===== MODAL HEADER ===== */
+        .modal-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid var(--beige);
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+        }
+
+        .modal-header-custom h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .badge-id-modal {
+            background: rgba(255,255,255,0.25);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-close-custom {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: transparent;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .btn-close-custom:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        /* ===== MODAL BODY - DOS COLUMNAS ===== */
+        .modal-body-custom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 420px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-body-custom { grid-template-columns: 1fr; }
+        }
+
+        /* ===== COLUMNA IZQUIERDA - Datos del consentimiento ===== */
+        .col-datos {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .donante-resumen {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--beige) 100%);
+            border-radius: 16px;
+            border: 1px solid var(--beige);
+            margin-bottom: 0.5rem;
+        }
+
+        .donante-avatar-lg {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--terracotta) 0%, var(--terracotta-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+        }
+
+        .donante-resumen-text h4 {
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .donante-resumen-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .info-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            background: var(--cream);
+            border-radius: 14px;
+            border: 1px solid var(--beige);
+            transition: all 0.3s ease;
+        }
+
+        .info-group:hover {
+            background: var(--beige);
+            transform: translateX(4px);
+        }
+
+        .info-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--terracotta) 0%, var(--terracotta-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .info-icon.sage {
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--sage-dark) 100%);
+        }
+
+        .info-icon.gold {
+            background: linear-gradient(135deg, var(--gold) 0%, #B8945F 100%);
+        }
+
+        .info-icon.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #a03528 100%);
+        }
+
+        .info-icon.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #b8860b 100%);
+        }
+
+        .info-text {
+            flex: 1;
+        }
+
+        .info-text label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+        }
+
+        .info-text span {
+            font-size: 0.95rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        /* Estado badge grande */
+        .estado-badge-lg {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .estado-badge-lg.firmado {
+            background: rgba(139, 157, 131, 0.12);
+            color: var(--sage-green);
+            border: 2px solid rgba(139, 157, 131, 0.2);
+        }
+
+        .estado-badge-lg.pendiente {
+            background: rgba(212, 160, 23, 0.12);
+            color: var(--warning);
+            border: 2px solid rgba(212, 160, 23, 0.2);
+        }
+
+        .estado-badge-lg .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        /* Firma preview */
+        .firma-preview {
+            margin-top: 0.5rem;
+            padding: 1rem;
+            background: var(--cream);
+            border-radius: 14px;
+            border: 1px solid var(--beige);
+            text-align: center;
+        }
+
+        .firma-preview img {
+            max-width: 100%;
+            max-height: 140px;
+            border-radius: 10px;
+            border: 2px solid var(--beige);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .firma-preview img:hover {
+            transform: scale(1.02);
+            border-color: var(--sage-green);
+        }
+
+        .firma-preview a.pdf-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--danger-light);
+            color: var(--danger);
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .firma-preview a.pdf-link:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .firma-preview .firma-texto {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--dark);
+            padding: 1rem;
+            border: 2px dashed var(--beige);
+            border-radius: 10px;
+            background: white;
+        }
+
+        .firma-preview .no-firma {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        /* ===== COLUMNA DERECHA - Visual / Documento ===== */
+        .col-visual {
+            background: linear-gradient(160deg, var(--cream) 0%, var(--beige) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .col-visual::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139,157,131,0.08) 0%, transparent 70%);
+            animation: pulseBg 4s ease-in-out infinite;
+        }
+
+        @keyframes pulseBg {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .visual-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--sage-green) 0%, var(--terracotta) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 15px 40px rgba(139, 157, 131, 0.3);
+            animation: floatCircle 3s ease-in-out infinite;
+        }
+
+        @keyframes floatCircle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .visual-circle i {
+            font-size: 4rem;
+            color: white;
+        }
+
+        .visual-circle .estado-icon {
+            position: absolute;
+            bottom: -12px;
+            background: var(--warm-white);
+            color: var(--sage-green);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid var(--beige);
+        }
+
+        .visual-circle .estado-icon.pendiente {
+            color: var(--warning);
+        }
+
+        .visual-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            z-index: 1;
+        }
+
+        .visual-stat {
+            text-align: center;
+        }
+
+        .visual-stat .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--sage-dark);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .visual-stat .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== MODAL FOOTER ===== */
+        .modal-footer-custom {
+            padding: 1.2rem 2rem;
+            border-top: 1px solid var(--beige);
+            background: var(--cream);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .modal-footer-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .modal-footer-title i {
+            color: var(--sage-green);
+            margin-right: 0.5rem;
+        }
+
+        .btn-group-custom {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .btn-modal {
+            padding: 0.6rem 1.4rem;
+            border-radius: 25px;
+            border: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+
+        .btn-modal-edit {
+            background: var(--terracotta);
+            color: white;
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+        }
+
+        .btn-modal-edit:hover {
+            background: var(--sage-green);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(139, 157, 131, 0.3);
+        }
+
+        .btn-modal-back {
+            background: var(--beige);
+            color: var(--dark);
+        }
+
+        .btn-modal-back:hover {
+            background: var(--sage-green);
+            color: white;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .modal-card {
+                max-width: 100%;
+                margin: 0.5rem;
+            }
+            .col-datos { padding: 1.5rem; }
+            .visual-circle {
+                width: 140px;
+                height: 140px;
+            }
+            .visual-circle i { font-size: 3rem; }
+            .modal-footer-custom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- Backdrop con blur - fondo de lista de consentimientos -->
+    <div class="backdrop">
+        <div class="modal-card">
+
+            <!-- Header -->
+            <div class="modal-header-custom">
+                <h3>
+                    <i class="bi bi-file-earmark-check-fill"></i>
+                    Consentimiento Informado
+                    <span class="badge-id-modal" th:text="'#' + ${consentimiento.id}">#1</span>
+                </h3>
+                <a href="/consentimientos" class="btn-close-custom" title="Cerrar">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+
+            <!-- Body - Dos columnas -->
+            <div class="modal-body-custom">
+
+                <!-- Columna Izquierda: Datos -->
+                <div class="col-datos">
+
+                    <!-- Resumen del donante -->
+                    <div class="donante-resumen">
+                        <div class="donante-avatar-lg" th:text="${#strings.substring(consentimiento.donanteNombres,0,1)}">J</div>
+                        <div class="donante-resumen-text">
+                            <h4 th:text="${consentimiento.donanteNombres}">Juan Carlos Pérez</h4>
+                            <p th:text="'Doc: ' + ${consentimiento.donanteDocumento}">Doc: 1234567890</p>
+                        </div>
+                    </div>
+
+                    <div class="info-group">
+                        <div class="info-icon sage">
+                            <i class="bi bi-hash"></i>
+                        </div>
+                        <div class="info-text">
+                            <label>ID Consentimiento</label>
+                            <span th:text="${consentimiento.id}">1</span>
+                        </div>
+                    </div>
+
+                    <div class="info-group">
+                        <div class="info-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="info-text">
+                            <label>Fecha de Firma</label>
+                            <span th:text="${#temporals.format(consentimiento.fechaFirma, 'dd MMMM yyyy - HH:mm')}">15 de mayo de 2026 - 10:30</span>
+                        </div>
+                    </div>
+
+                    <div class="info-group">
+                        <div class="info-icon" th:class="${consentimiento.aceptaConsentimiento} ? 'info-icon sage' : 'info-icon warning'">
+                            <i th:class="${consentimiento.aceptaConsentimiento} ? 'bi bi-check-circle-fill' : 'bi bi-clock-fill'"></i>
+                        </div>
+                        <div class="info-text">
+                            <label>Estado</label>
+                            <span>
+                                <span th:if="${consentimiento.aceptaConsentimiento}" class="estado-badge-lg firmado">
+                                    <span class="dot"></span> Firmado y aceptado
+                                </span>
+                                <span th:unless="${consentimiento.aceptaConsentimiento}" class="estado-badge-lg pendiente">
+                                    <span class="dot"></span> Pendiente de firma
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Firma / Archivo -->
+                    <div class="info-group">
+                        <div class="info-icon gold">
+                            <i class="bi bi-pen-fill"></i>
+                        </div>
+                        <div class="info-text">
+                            <label>Firma / Documento</label>
+                        </div>
+                    </div>
+
+                    <div class="firma-preview">
+    <!-- Imagen subida -->
+    <th:block th:if="${consentimiento.archivoConsentimiento != null
+        and (consentimiento.archivoConsentimiento.endsWith('.jpg')
+          or consentimiento.archivoConsentimiento.endsWith('.jpeg')
+          or consentimiento.archivoConsentimiento.endsWith('.png')
+          or consentimiento.archivoConsentimiento.endsWith('.gif')
+          or consentimiento.archivoConsentimiento.endsWith('.webp'))}">
+        <img th:src="'/uploads/consentimientos/' + ${consentimiento.archivoConsentimiento}"
+             alt="Firma del donante"
+             onclick="verImagenGrande(this.src)"
+             title="Click para ampliar"/>
+    </th:block>
+
+    <!-- PDF subido -->
+    <th:block th:if="${consentimiento.archivoConsentimiento != null
+        and consentimiento.archivoConsentimiento.endsWith('.pdf')}">
+        <a th:href="'/uploads/consentimientos/' + ${consentimiento.archivoConsentimiento}"
+           target="_blank"
+           class="pdf-link">
+            <i class="bi bi-file-earmark-pdf"></i> Ver PDF del consentimiento
+        </a>
+    </th:block>
+
+    <!-- Firma de texto -->
+    <th:block th:if="${consentimiento.archivoConsentimiento == null
+        and consentimiento.firmaConsentimiento != null}">
+        <div class="firma-texto" th:text="${consentimiento.firmaConsentimiento}">Juan Carlos Pérez García</div>
+    </th:block>
+
+    <!-- Sin firma -->
+    <th:block th:if="${consentimiento.archivoConsentimiento == null
+        and consentimiento.firmaConsentimiento == null}">
+        <div class="no-firma">
+            <i class="bi bi-x-circle" style="color: var(--danger);"></i>
+            Sin firma registrada
+        </div>
+    </th:block>
+</div>
+
+                </div>
+
+                <!-- Columna Derecha: Visual -->
+                <div class="col-visual">
+                    <div class="visual-circle">
+                        <i th:class="${consentimiento.aceptaConsentimiento} ? 'bi bi-file-earmark-check-fill' : 'bi bi-file-earmark'"></i>
+                        <div class="estado-icon" th:classappend="${!consentimiento.aceptaConsentimiento} ? 'pendiente' : ''"
+                             th:text="${consentimiento.aceptaConsentimiento} ? 'Firmado' : 'Pendiente'">Firmado</div>
+                    </div>
+
+                    <div class="visual-stats">
+                        <div class="visual-stat">
+                            <div class="number" th:text="'#' + ${consentimiento.id}">#1</div>
+                            <div class="label">Consentimiento</div>
+                        </div>
+                        <div class="visual-stat">
+                            <div class="number" th:text="${#temporals.format(consentimiento.fechaFirma, 'dd/MM')}">15/05</div>
+                            <div class="label">Fecha</div>
+                        </div>
+                        <div class="visual-stat">
+                            <div class="number" th:text="${consentimiento.aceptaConsentimiento} ? 'Sí' : 'No'">Sí</div>
+                            <div class="label">Aceptado</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer-custom">
+                <div class="modal-footer-title">
+                    <i class="bi bi-file-earmark-text-fill"></i>
+                    <span th:text="'Consentimiento de ' + ${consentimiento.donanteNombres}">Consentimiento de Juan Pérez</span>
+                </div>
+                <div class="btn-group-custom">
+                    <a th:href="@{/consentimientos}" class="btn-modal btn-modal-back">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <a th:href="@{/consentimientos/editar/{id}(id=${consentimiento.id})}" class="btn-modal btn-modal-edit">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal imagen grande -->
+    <div class="modal fade" id="modalImagen" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="background:transparent; border:none;">
+                <div class="modal-header" style="background:#111; border:none; border-radius: 12px 12px 0 0;">
+                    <span style="color:white; font-size:0.9rem;"><i class="bi bi-file-earmark-image me-2"></i>Firma del Donante</span>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="background:#000; padding:0; display:flex; align-items:center; justify-content:center; border-radius: 0 0 12px 12px;">
+                    <img id="modalImagenSrc" src="" alt="Firma" style="max-width:100%; max-height:80vh; object-fit:contain; border-radius: 0 0 12px 12px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="~{fragments/sidebar :: sidebar-js}"></div>
+
+    <script>
+        function verImagenGrande(src) {
+            document.getElementById('modalImagenSrc').src = src;
+            const modal = new bootstrap.Modal(document.getElementById('modalImagen'));
+            modal.show();
+        }
+    </script>
+
+</body>
+</html>

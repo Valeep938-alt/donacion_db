@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' - BloodBank SENA'">Donantes</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <div th:replace="~{fragments/sidebar :: sidebar-css}"></div>
+
+    <style>
+        :root {
+            --sage-green: #8B9D83;
+            --sage-dark: #6B7D63;
+            --terracotta: #D4A574;
+            --terracotta-light: #E8C4A0;
+            --cream: #FAF6F0;
+            --beige: #F0E8DC;
+            --warm-white: #FDFCFA;
+            --dark: #3D4A3D;
+            --text-muted: #7A8A7A;
+            --danger: #C44536;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--dark);
+        }
+
+        h1, h2, h3, h4, h5, h6 { 
+            font-family: 'Playfair Display', serif; 
+            font-weight: 500;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 991.98px) {
+            .main-content { margin-left: 0; padding: 1rem; }
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--beige);
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .btn-primary-custom {
+            background: var(--terracotta);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            border: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .btn-primary-custom:hover {
+            background: var(--sage-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 576px) {
+            .stats-bar { grid-template-columns: 1fr; }
+        }
+
+        .stat-mini {
+            background: var(--warm-white);
+            border-radius: 16px;
+            padding: 1.2rem;
+            border: 1px solid var(--beige);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-mini-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .stat-mini:nth-child(1) .stat-mini-icon { background: rgba(139, 157, 131, 0.15); color: var(--sage-green); }
+        .stat-mini:nth-child(2) .stat-mini-icon { background: rgba(212, 165, 116, 0.15); color: var(--terracotta); }
+        .stat-mini:nth-child(3) .stat-mini-icon { background: rgba(107, 125, 99, 0.15); color: var(--sage-dark); }
+        .stat-mini:nth-child(4) .stat-mini-icon { background: rgba(232, 196, 160, 0.3); color: var(--terracotta); }
+
+        .stat-mini-info h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .stat-mini-info span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== CARD ===== */
+        .card-custom {
+            background: var(--warm-white);
+            border-radius: 20px;
+            border: 1px solid var(--beige);
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--beige);
+        }
+
+        .card-header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header-title i {
+            color: var(--terracotta);
+            font-size: 1.3rem;
+        }
+
+        .card-header-title h3 {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        /* ===== SEARCH ===== */
+        .search-box {
+            position: relative;
+            width: 280px;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: 2px solid var(--beige);
+            border-radius: 25px;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            font-size: 0.9rem;
+            background: var(--cream);
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: var(--terracotta);
+            background: white;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ===== TABLE ===== */
+        .table-responsive {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .table-custom {
+            width: 100%;
+            margin: 0;
+        }
+
+        .table-custom thead th {
+            background: var(--cream);
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            padding: 1rem;
+            white-space: nowrap;
+        }
+
+        .table-custom tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--beige);
+            font-size: 0.9rem;
+        }
+
+        .table-custom tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-custom tbody tr:hover {
+            background: var(--cream);
+        }
+
+        /* ===== DONOR INFO ===== */
+        .donor-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .donor-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--sage-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .donor-name {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .donor-doc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== BADGES ===== */
+        .badge-sangre {
+            display: inline-block;
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .badge-sangre.positive { background: var(--terracotta); }
+        .badge-sangre.negative { background: var(--sage-green); }
+
+        .badge-estado {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-estado.activo { background: rgba(139, 157, 131, 0.12); color: var(--sage-green); }
+        .badge-estado.inactivo { background: rgba(196, 69, 54, 0.08); color: var(--danger); }
+
+        /* ===== ACTION BUTTONS ===== */
+        .btn-action {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            margin: 0 2px;
+        }
+
+        .btn-view {
+            background: rgba(139, 157, 131, 0.12);
+            color: var(--sage-green);
+        }
+
+        .btn-view:hover {
+            background: var(--sage-green);
+            color: white;
+        }
+
+        .btn-edit {
+            background: rgba(212, 165, 116, 0.12);
+            color: var(--terracotta);
+        }
+
+        .btn-edit:hover {
+            background: var(--terracotta);
+            color: white;
+        }
+
+        .btn-delete {
+            background: rgba(196, 69, 54, 0.08);
+            color: var(--danger);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert-custom {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-success-custom {
+            background: rgba(139, 157, 131, 0.1);
+            color: var(--sage-dark);
+            border-left: 4px solid var(--sage-green);
+        }
+
+        .alert-danger-custom {
+            background: rgba(196, 69, 54, 0.06);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--beige);
+        }
+
+        .empty-state h4 {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ===== PAGINATION ===== */
+        .pagination-custom {
+            display: flex;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--beige);
+        }
+
+        .pagination-custom a {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: 1px solid var(--beige);
+        }
+
+        .pagination-custom a:hover,
+        .pagination-custom a.active {
+            background: var(--terracotta);
+            color: white;
+            border-color: var(--terracotta);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            .search-box {
+                width: 100%;
+            }
+            .card-header-custom {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1 th:text="${titulo}">Donantes Registrados</h1>
+                <p>Gestión de donantes de sangre</p>
+            </div>
+            <a href="/donantes/nuevo" class="btn-primary-custom">
+                <i class="bi bi-plus-lg"></i>
+                Nuevo Donante
+            </a>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-mini">
+                <div class="stat-mini-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4 th:text="${#lists.size(donantes)}">1,234</h4>
+                    <span>Total Donantes</span>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4>856</h4>
+                    <span>Donaciones este mes</span>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon">
+                    <i class="bi bi-droplet-fill"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4>O+</h4>
+                    <span>Tipo más común</span>
+                </div>
+            </div>
+            <div class="stat-mini">
+                <div class="stat-mini-icon">
+                    <i class="bi bi-person-plus-fill"></i>
+                </div>
+                <div class="stat-mini-info">
+                    <h4>+24</h4>
+                    <span>Nuevos esta semana</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div th:if="${mensajeExito}" class="alert alert-success-custom alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            <span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${mensajeError}" class="alert alert-danger-custom alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Card de Lista -->
+        <div class="card-custom">
+            <div class="card-header-custom">
+                <div class="card-header-title">
+                    <i class="bi bi-list-ul"></i>
+                    <h3>Lista de Donantes</h3>
+                </div>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por nombre o documento..." onkeyup="filtrarTabla()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-custom" id="tablaDonantes">
+                    <thead>
+                        <tr>
+                            <th>Donante</th>
+                            <th>Documento</th>
+                            <th>Tipo Sangre</th>
+                            <th>Edad</th>
+                            <th>Contacto</th>
+                            <th>Estado</th>
+                            <th style="text-align: center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="donante : ${donantes}">
+                            <td>
+                                <div class="donor-info">
+                                    <div class="donor-avatar" th:text="${#strings.substring(donante.nombres,0,1)}">J</div>
+                                    <div>
+                                        <div class="donor-name" th:text="${donante.nombres} + ' ' + ${donante.apellidos}">Juan Pérez</div>
+                                        <div class="donor-doc" th:text="${donante.correo}">juan@email.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td th:text="${donante.documento}">12345678</td>
+                            <td>
+                                <span class="badge-sangre positive" th:text="${donante.tipoSangre.descripcion}">O+</span>
+                            </td>
+                            <td th:text="${donante.edad} + ' años'">25 años</td>
+                            <td th:text="${donante.telefono}">3001234567</td>
+                            <td>
+                                <span class="badge-estado activo">Activo</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <a th:href="@{/donantes/detalle/{id}(id=${donante.id})}" 
+                                   class="btn-action btn-view" title="Ver detalle">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a th:href="@{/donantes/editar/{id}(id=${donante.id})}" 
+                                   class="btn-action btn-edit" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{/donantes/eliminar/{id}(id=${donante.id})}" 
+                                   class="btn-action btn-delete" 
+                                   onclick="return confirm('¿Está seguro de eliminar este donante?')"
+                                   title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(donantes)}">
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <h4>No hay donantes registrados</h4>
+                                    <p>Comienza registrando tu primer donante usando el botón de arriba</p>
+                                    <a href="/donantes/nuevo" class="btn-primary-custom">
+                                        <i class="bi bi-plus-lg"></i>
+                                        Nuevo Donante
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-custom" th:if="${!#lists.isEmpty(donantes)}">
+                <a href="#"><i class="bi bi-chevron-left"></i></a>
+                <a href="#" class="active">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <span style="color: var(--text-muted); padding: 0.5rem;">...</span>
+                <a href="#">8</a>
+                <a href="#"><i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="~{fragments/sidebar :: sidebar-js}"></div>
+
+    <script>
+        function filtrarTabla() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('tablaDonantes');
+            const tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                const tdNombre = tr[i].getElementsByTagName('td')[0];
+                const tdDocumento = tr[i].getElementsByTagName('td')[1];
+
+                if (tdNombre || tdDocumento) {
+                    const txtNombre = tdNombre.textContent || tdNombre.innerText;
+                    const txtDocumento = tdDocumento.textContent || tdDocumento.innerText;
+
+                    if (txtNombre.toUpperCase().indexOf(filter) > -1 ||
+                        txtDocumento.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = '';
+                    } else {
+                        tr[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
